@@ -2,6 +2,7 @@
 session_start();
 include ("lib/db.php");
 include ("lib/misc.php");
+include ("lib/user_control_lib.php");
 
 if (empty($_SESSION["logg"]))
 	header('Location: /final/index.php');
@@ -119,8 +120,6 @@ ob_end_clean();
 					$tmp=$_FILES['userfile']['tmp_name'];
 
 					insert_user($file, $tmp);
-											//$values=[$_POST["name"],$_POST["usr"],$_POST["p"];
-
 				}
 				?>
 				<div class="p-20 m-b-20">

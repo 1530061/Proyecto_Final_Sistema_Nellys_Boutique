@@ -1,6 +1,6 @@
 <?php
 	include ("db.php");
-	include ("control_usuarios_lib.php");
+	include ("user_control_lib.php");
 
 
 	switch ($_GET['t']) {
@@ -33,6 +33,9 @@
 	        break;
 		case 9:
 	        echo ''.get_of_usrbyID($_GET['id'].'',"biografia");
+	        break;
+		case 10:
+	        echo ''.get_of_usrbyID($_GET['id'].'',"fotografia");
 	        break;
 	    default:
 	        echo '';

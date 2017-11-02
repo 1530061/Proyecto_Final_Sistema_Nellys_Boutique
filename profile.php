@@ -2,6 +2,7 @@
   session_start();
   include ("lib/db.php");
   include ("lib/misc.php");
+  include ("lib/contacts_lib.php");
 
   if (empty($_SESSION["logg"]))
     header('Location: /final/index.php');

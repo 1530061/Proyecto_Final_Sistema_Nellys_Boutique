@@ -26,6 +26,9 @@ ob_end_clean();
 
 	<link rel="shortcut icon" href="assets/images/favicon.ico">
 
+    <!-- Sweet Alert -->
+    <link href="assets/plugins/sweet-alert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
+
 	<!--Morris Chart CSS -->
 	<link rel="stylesheet" href="assets/plugins/morris/morris.css">
 
@@ -114,12 +117,9 @@ ob_end_clean();
 						<strong> La imagen excede el tamaño permitido (>8MB)
 						</div>');
 				}
-				if(isset($_POST["usr_nombre"])){
-					
-					$file=$_FILES['userfile']['name'];
-					$tmp=$_FILES['userfile']['tmp_name'];
+				if(isset($_POST["usr_id"])){
 
-					update_user($file, $tmp);
+					delete_user();
 					//$values=[$_POST["name"],$_POST["usr"],$_POST["p"];
 					
 				}
@@ -140,7 +140,7 @@ ob_end_clean();
 						</div>
 					</div>
 					<div id="contain_form">
-						<form enctype="multipart/form-data" action="user_mod.php" id="usrmod_from" name="test" class="form-validation" novalidate="" method="post" style="display:none;">
+						<form enctype="multipart/form-data" action="user_del.php" id="usrmod_from" name="test" class="form-validation" novalidate="" method="post" style="display:none;">
 					
 							
 							<hr>
@@ -156,102 +156,74 @@ ob_end_clean();
 							<br>
 							<div class="form-group">
 								<label for="userName">Nombre<span class="text-danger">*</span></label>
-								<input type="text" name="usr_nombre" parsley-trigger="change" required="" class="form-control" id="usr_nombre" value="<?php err_print('usr_nombre');?>">
+								<input type="text" name="usr_nombre" parsley-trigger="change" required="" readonly class="form-control" id="usr_nombre" value="<?php err_print('usr_nombre');?>">
 							</div>
 							<div class="form-group">
 								<label for="usr_app">Apellido Paterno<span class="text-danger">*</span></label>
-								<input type="text" name="usr_app" parsley-trigger="change" required="" class="form-control" id="usr_app" value="<?php err_print('usr_app');?>">
+								<input type="text" name="usr_app" parsley-trigger="change" required="" readonly class="form-control" id="usr_app" value="<?php err_print('usr_app');?>">
 							</div>
 							<div class="form-group">
 								<label for="usr_amp">Apellido Materno<span class="text-danger"></span></label>
-								<input type="text" name="usr_apm" parsley-trigger="change" class="form-control" id="usr_apm" value="<?php err_print('usr_apm');?>">
+								<input type="text" name="usr_apm" parsley-trigger="change" class="form-control" readonly id="usr_apm" value="<?php err_print('usr_apm');?>">
 							</div>
 							<div class="form-group">
 								<label for="datepicker-autoclose">Fecha de Nacimiento<span class="text-danger">*</span></label>
 								<div class="input-group">
-									<input type="text" name="usr_fn" class="form-control" placeholder="mm/dd/yyyy" id="datepicker-autoclose" parsley-trigger="change" required="" value="<?php err_print('usr_fn');?>">
+									<input type="text" name="usr_fn" class="form-control" placeholder="mm/dd/yyyy" readonly id="datepicker-autoclose" parsley-trigger="change" required="" value="<?php err_print('usr_fn');?>">
 									<span class="input-group-addon bg-custom b-0"><i class="mdi mdi-calendar text-white"></i></span>
 								</div>
 							</div>
 							<label>Genero<span class="text-danger">*</span></label>
 							<div class="form-group">
 								<div class="radio radio-info radio-inline">
-									<input type="radio" id="usr_ge1" value="M" name="usr_ge" <?php if(isset($_POST["usr_ge"])){if($_POST["usr_ge"]=="M")echo('checked=""');}else{echo('checked=""');}?>>
+									<input type="radio" id="usr_ge1" value="M" readonly name="usr_ge" <?php if(isset($_POST["usr_ge"])){if($_POST["usr_ge"]=="M")echo('checked=""');}else{echo('checked=""');}?>>
 									<label for="usr_ge1"> Masculino </label>
 								</div>
 								<div class="radio radio-danger radio-inline">
-									<input type="radio" id="usr_ge2" value="F" name="usr_ge" <?php if(isset($_POST["usr_ge"]))if($_POST["usr_ge"]=="F")echo('checked=""'); ?>>
+									<input type="radio" id="usr_ge2" value="F" readonly name="usr_ge" <?php if(isset($_POST["usr_ge"]))if($_POST["usr_ge"]=="F")echo('checked=""'); ?>>
 									<label for="usr_ge2"> Femenino </label>
 								</div>
 							</div>
 							<label>Fotografia</label>
-							<div class="thumb-xl member-thumb m-b-10 center-block">
-								<img src="usr_img\0.png" id="fotografia" class="img-circle img-thumbnail" alt="profile-image">
-							</div>
-							<br>
-							<div class="pull-right">
-								<span class="text-warning"> * No se modificara la imagen si se deja en blanco</span>
-							</div>
-							<br>
-							<div class="form-group m-b-0">
-								<input type="file" class="filestyle" name="userfile" data-buttonname="btn-primary" id="filestyle-5"  tabindex="-1" style="position: absolute; clip: rect(0px 0px 0px 0px);">
-								<div class="bootstrap-filestyle input-group"> 
-									<span class="group-span-filestyle input-group-btn" tabindex="0" id="summmer">
-
-									</span>
-								</div>         
+							<div>
+								<div class="thumb-xl member-thumb m-b-10 center-block">
+									<img src="usr_img\0.png" id="fotografia" class="img-circle img-thumbnail" alt="profile-image">
+								</div>
+													
 							</div>
 							<hr>
 							<div class="form-group">
 								<label for="usr_user">Usuario<span class="text-danger">*</span></label>
-								<input type="text" name="usr_user" parsley-trigger="change" required="" placeholder="" class="form-control" id="usr_user">
-							</div>
-							<label>Contraseña</label>
-							<div class="pull-right">
-								<span class="text-danger"> * Cambio de contraseña obligatorio</span>
-							</div>
-							<div class="form-group">
-
-								<input id="pass1" name="usr_pass" type="password" placeholder="Password" required="" class="form-control">
-							</div>
-							<div class="form-group">
-								<label for="usr_pass">Confirmar Contraseña <span class="text-danger">*</span></label>
-								<input data-parsley-equalto="#pass1" type="password" required="" placeholder="Password" class="form-control" id="usr_pass">
+								<input type="text" name="usr_user" parsley-trigger="change" required="" readonly placeholder="" class="form-control" id="usr_user">
 							</div>
 							<label >Nivel<span class="text-danger">*</span></label>
 							<div class="form-group">
 								<div class="radio radio-info radio-inline" onchange="yesnoCheck(this);">
-									<input type="radio" id="usr_niv1" value="1" name="usr_niv" <?php if(isset($_POST["usr_niv"]))if($_POST["usr_niv"]=="1")echo('checked=""'); ?>>
+									<input type="radio" id="usr_niv1" value="1" readonly name="usr_niv" <?php if(isset($_POST["usr_niv"]))if($_POST["usr_niv"]=="1")echo('checked=""'); ?>>
 									<label for="usr_niv1"> Empleado </label>
 								</div>
 								<div class="radio radio-warning radio-inline" onchange="yesnoCheck2(this);">
-									<input type="radio" id="usr_niv2" value="0" name="usr_niv" <?php if(isset($_POST["usr_niv"]))if($_POST["usr_niv"]=="0")echo('checked=""'); ?> >
+									<input type="radio" id="usr_niv2" value="0" readonly name="usr_niv" <?php if(isset($_POST["usr_niv"]))if($_POST["usr_niv"]=="0")echo('checked=""'); ?> >
 									<label for="usr_niv2"> Administrador </label>
 								</div>
 							</div>
-							<div class="form-group" id="emg" style="display:none;">
-								<label for="usr_em">Email (Requerido para Administradores)<span class="text-danger">*</span></label>
-								<input type="email" name="usr_em" parsley-trigger="change" class="form-control" id="usr_em" value="<?php err_print('usr_em');?>">
+							<div class="form-group" id="emg"">
+								<label for="usr_em">Email <span class="text-danger">*</span></label>
+								<input type="email" readonly name="usr_em" parsley-trigger="change" class="form-control" id="usr_em" value="<?php err_print('usr_em');?>">
 							</div>
-							<div class="form-group" id="telf" style="display:none;">
-								<label for="usr_tel">Telefono (Requerido para Administradores)<span class="text-danger">*</span></label>
-								<input type="tel" name="usr_tel" parsley-trigger="change" placeholder="" class="form-control" id="usr_tel">
+							<div class="form-group" id="telf"">
+								<label for="usr_tel">Telefono<span class="text-danger">*</span></label>
+								<input type="tel" readonly name="usr_tel" parsley-trigger="change" placeholder="" class="form-control" id="usr_tel">
 							</div>
-							<div class="form-group" id="sum" style="display:none;">
-								<label for="summernote">Biografia<span class="text-danger"></span></label>
-								<fieldset>
-
-									<p class="container">
-										<textarea class="input-block-level" id="summernote" name="content" rows="2">
-										</textarea>
-									</p>
-								</fieldset>
+							<label>Biografia</label>
+							<div class="form-group" readonly id="sum"">
+								
 
 							</div>
 							<hr>
 							<div class="form-group text-right m-b-0">
-								<button class="btn btn-primary btn-bordered btn-lg" type="submit" style="width:35%" >
-									<i class="mdi mdi-check"></i>Guardar
+								<button class="btn btn-danger btn-bordered btn-lg" id="sub" type="submit" style="width:35%" >
+									<i class="fa fa-remove"></i>Eliminar
 								</button>
 							</div>
 						</form>
@@ -321,14 +293,36 @@ ob_end_clean();
 	<script src="assets/pages/jquery.form-advanced.init.js"></script>
 
 
+    <!-- Sweet-Alert  -->
+    <script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
 
 	<!-- App Js -->
 	<script src="assets/js/jquery.app.js"></script>
 
+			<script>
+			
+				$(document).on('click', '#sub', function(e) {
+			    e.preventDefault();
+			    swal({
+			 		title: "¿Esta seguro que desea eliminar el usuario?",
+			        text: "No podra recuperar la informacion relacionada al usuario",
+			        type: "warning",
+			        showCancelButton: true,
+			        confirmButtonColor: "#DD6B55",
+			        confirmButtonText: "Si",
+			        cancelButtonText: "Cancelar",
+			        closeOnConfirm: false
+			    }).then(function (result) {
+			        $('#usrmod_from').submit();
+			    });
+			});
 
+		</script>
 	<script>
 			//Select 2 buscador de nombres y usuarios
-			var elem = ["usr_nombre","usr_app","usr_apm","datepicker-autoclose","usr_user", "usr_em", "usr_tel","usr_niv1","usr_ge2","summernote","fotografia" ]; //Elementos a modificar
+			var elem = ["usr_nombre","usr_app","usr_apm","datepicker-autoclose","usr_user", "usr_em", "usr_tel","usr_niv1","usr_ge2","sum","fotografia"]; //Elementos a modificar
 			$(document).ready(function() {
 				var select2 = $('.js-example-basic-single').select2({ placeholder: "Ingrese usuario o nombre del usuario para comenzar con la modificacion de un usuario " });
 			});
@@ -378,7 +372,7 @@ ob_end_clean();
 					document.getElementById(elem_id).checked = "true";
 				}else{
 					if(tipo==9){
-						$('textarea[name="content"]').summernote('code',responseText);
+						document.getElementById(elem_id).innerHTML= responseText;
 					}else if(tipo==10){
 						document.getElementById(elem_id).src= responseText;
 					}
@@ -450,8 +444,7 @@ ob_end_clean();
 			var postForm = function() {
 				var content = $('textarea[name="content"]').html($('#summernote').code());
 			}
-
-
 		</script>
+
 	</body>
 	</html>
