@@ -1,6 +1,6 @@
 <?php 
 	include ("lib/db.php");
-	include ("lib/log.php");
+	include ("lib/login_lib.php");
 
 	session_start();
 

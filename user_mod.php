@@ -363,7 +363,10 @@ ob_end_clean();
 			function drawOutput(responseText, tipo) {
 				//RADIOBUTTON GENERO
 				elem_id=elem[tipo];
+				
 				if(tipo==8 || tipo==7){
+					responseText=responseText.replace(/(\r\n|\n|\r)/gm,"");
+					console.log(responseText);
 					if(responseText=="1"){
 						elem_id="usr_niv1";
 						yesnoCheck();

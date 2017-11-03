@@ -339,39 +339,6 @@ function sweetalert($message, $type){
 	}
 }
 
-function allcontacts(){
-	$id_users=select("select CONCAT(nombre,' ',apellido_paterno,' ', apellido_materno), email, fotografia, telefono, id from usuario where nivel=0");
-	
-	for($i=0;$i<sizeof($id_users);$i++){
-			//if($i%3==0 )
-				 //echo('<div class="row">');
-		echo('
-			<div class="col-md-4">
-			<div class="text-center card-box">
-			<div class="clearfix"></div>
-			<div class="member-card" style=" height:250px">
-			<div class="thumb-xl member-thumb m-b-10 center-block">
-			<img src="'.array_values($id_users[$i])[2].'" class="img-circle img-thumbnail" alt="profile-image">
-			<i class="mdi mdi-star-circle member-star text-success" title="Usuario Administrador"></i>
-			</div>
-
-			<div class="">
-			<h4 class="m-b-5">'.array_values($id_users[$i])[0].'</h4>
-			<p class="text-muted">'.array_values($id_users[$i])[3].' <span> | <span> <a href="#" class="text-pink">'.array_values($id_users[$i])[1].'</a> </span></p>
-			</div>
-
-			
-			<a href="profile.php?id='.array_values($id_users[$i])[4].'"><button type="button" class="btn btn-default btn-sm m-t-10">Ver Perfil</button></a>
-			</div>
-			</div>
-			</div>'
-		);
-			 //if($i%3==0 )
-				 //echo('</div>');
-
-			//echo(array_values($id_users[$i])[0]."<br>");
-	}
-}
 function motd(){
 	$nombre=select("select CONCAT(u.nombre,' ',u.apellido_paterno,' ', u.apellido_materno), u.fotografia, m.mensaje, m.fecha from motd as m inner join usuario as u where u.id=m.id_usuario and m.id = ALL(select max(id) from motd)");
 	$date=date_create(array_values($nombre[0])[3]);

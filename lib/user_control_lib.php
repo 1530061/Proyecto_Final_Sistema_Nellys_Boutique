@@ -1,7 +1,7 @@
 <?php
 
 function get_of_usrbyID($id, $column){
-	return array_values(select("select ".$column." from usuario where id='".$id."'")[0])[0]. '';
+	return array_values(select("select ".$column." from usuario where id=".$id."")[0])[0];
 }
 
 function update_user($file, $tmp){
@@ -79,8 +79,13 @@ function update_user($file, $tmp){
 
 function delete_user(){
 	$id=$_POST['usr_id'];
-	$columns=["activo"];
-	$values=["0"];
+	$filepath=array_values(select("select fotografia from usuario where id=".$id)[0])[0];
+	if($filepath!='usr_img\0.png' && substr($filepath,0,8)=='usr_img\\'){
+		unlink($filepath);
+	}
+	
+	$columns=["activo","user","pass","fotografia"];
+	$values=['0','null','null',st('usr_img\\\\0.png')];
 	$table="usuario";
 	$condition="where id=".$id;
 	update($columns,$values,$table,$condition);
@@ -102,7 +107,6 @@ function insert_user($file, $tmp){
 				$columns=["nombre", "apellido_paterno", "apellido_materno", "fecha_nac", "user", "pass", "nivel", "genero", "email", "biografia","telefono","activo"];
 
 				if(!empty($_FILES['userfile']['name'])){
-						//Parametros de insercion de imagen
 					$errors     = array();
 					    $maxsize    = 2097152;		//2MB
 					    $acceptable = array(		//Tipos
@@ -168,13 +172,13 @@ function insert_user($file, $tmp){
 	}
 
 function fill_search_mod_usr(){
-	$user_info = select("select id, CONCAT(nombre,' ',apellido_paterno,' ', apellido_materno) from usuario where activo=1");
+	$user_info = select("select id, CONCAT(nombre,' ',apellido_paterno,' ', apellido_materno) from usuario where activo=1 and id!=".$_SESSION['id']);
 	echo('<optgroup label="Nombre Completo">');
 	for($i=0;$i<count($user_info);$i++){
 		echo('<option value="'.array_values($user_info[$i])[0].'">'.array_values($user_info[$i])[1].'</option>');
 	}
 	echo('<optgroup label="Usuario">');
-	$user_info = select("select id, user from usuario where activo=1");
+	$user_info = select("select id, user from usuario where activo=1 and id!=".$_SESSION['id']);
 	for($i=0;$i<count($user_info);$i++){
 		echo('<option value="'.array_values($user_info[$i])[0].'">'.array_values($user_info[$i])[1].'</option>');
 	}

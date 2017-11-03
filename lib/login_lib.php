@@ -2,7 +2,7 @@
 
 function exists_user($user, $pass){
 	if (!empty($user) && !empty($pass)) {
-		$verification=select("select id from usuario where user='".$user."' and pass='".$pass."';");
+		$verification=select("select id from usuario where user='".$user."' and pass='".$pass."' and activo=1;");
 		if(array_values($verification[0])[0]!="0"){
 			session_start();
 			$_SESSION["logg"] = "true";
