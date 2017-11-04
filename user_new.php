@@ -214,7 +214,7 @@ ob_end_clean();
 						</div>
 						<hr>
 						<div class="form-group text-right m-b-0">
-							<button type="reset" class="btn btn-danger btn-bordered btn-lg" style="width:25%">
+							<button onclick="gotop();" type="reset" class="btn btn-danger btn-bordered btn-lg" style="width:25%">
 								<i class="mdi mdi-close"></i>Cancelar
 							</button>
 							<button class="btn btn-primary btn-bordered btn-lg" type="submit" style="width:35%" >
@@ -317,6 +317,11 @@ ob_end_clean();
 			document.getElementById("emg").style.display = "block" 
 			document.getElementById("telf").style.display = "block";
 			document.getElementById("summer").style.display = "block";
+		}
+		function gotop(){
+		    $('html, body').animate({
+		        scrollTop: $("#page-right-content").offset().top
+		    }, 500);
 		}
 	</script>
 	

@@ -2,7 +2,7 @@
 session_start();
 include ("lib/db.php");
 include ("lib/misc.php");
-include ("lib/user_control_lib.php");
+include ("lib/stock_lib.php");
 
 if (empty($_SESSION["logg"]))
 	header('Location: /final/index.php');
@@ -18,13 +18,16 @@ ob_end_clean();
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>Modificar Usuario</title>
+	<title>Eliminar Usuario</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
 	<meta content="Coderthemes" name="author" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
 	<link rel="shortcut icon" href="assets/images/favicon.ico">
+
+    <!-- Sweet Alert -->
+    <link href="assets/plugins/sweet-alert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
 
 	<!--Morris Chart CSS -->
 	<link rel="stylesheet" href="assets/plugins/morris/morris.css">
@@ -39,8 +42,7 @@ ob_end_clean();
 	<link href="assets/plugins/clockpicker/css/bootstrap-clockpicker.min.css" rel="stylesheet">
 	<link href="assets/plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
 
-
-    <!-- DataTables -->
+	<!-- DataTables -->
     <link href="assets/plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css"/>
     <link href="assets/plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css"/>
     <link href="assets/plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css"/>
@@ -59,7 +61,6 @@ ob_end_clean();
 	<!-- Custom styles for this template -->
 	<link href="assets/css/style.css" rel="stylesheet">
 	<link href="assets/plugins/summernote/summernote.css" rel="stylesheet" />
-
 
 
 
@@ -106,18 +107,26 @@ ob_end_clean();
 				<!-- Logo and name -->
 				<div class="row" style="height:70px;">
 					<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-						<span class="mdi mdi-account-star-variant" style="font-size: 60px; padding-left: 10px;" ></span> 
+						<span class="mdi mdi-account-remove" style="font-size: 60px; padding-left: 10px;" ></span> 
 					</div>
 					<div class="col-sm-11 col-md-8 col-lg-11">
-						<h1 style="color:#D52B2B;"> Modificar Usuario </h1>
+						<h1 style="color:#D52B2B;"> Eliminar Usuario </h1>
 					</div>
-					<hr>
+
 				</div>
 
 
 
-
 				<?php
+				$tabla=select("select p.codigo, p.nombre, p.descripcion, tp.nombre, t.talla, p.cantidad_stock from producto p inner join tipo_producto tp on tp.id = p.id_tipo inner join talla t on p.id_talla=t.id where activo=1");
+				for($i=0;$i<sizeof($tabla);$i++){
+					for($j=0;$j<sizeof($tabla[0]);$j++){
+						echo(array_values($tabla[$i])[$j]);
+						echo('   ');
+					}
+					echo('<br>');
+
+				}
 				if($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) &&
 					empty($_FILES) && $_SERVER['CONTENT_LENGTH'] > 0)
 				{
@@ -128,22 +137,18 @@ ob_end_clean();
 						<strong> La imagen excede el tamaño permitido (>8MB)
 						</div>');
 				}
-				if(isset($_POST["usr_nombre"])){
-					
-					$file=$_FILES['userfile']['name'];
-					$tmp=$_FILES['userfile']['tmp_name'];
+				if(isset($_POST["prod_cod"])){
 
-					update_user($file, $tmp);
+					//delete_user();
 					//$values=[$_POST["name"],$_POST["usr"],$_POST["p"];
 					
 				}
 				?>
 				<div class="p-20 m-b-20">
-					
 					<div class="row">
 						<div class= "col-lg-12">
-							<h3 style="color:#6A2E98;" class="header-title m-t-0"> Busqueda un solo usuario</h3>
-							<h5 > <i class="mdi mdi-information-outline"></i> Ingrese en el buscador el nombre o el usuario de cualquier usuario registrado para ver toda su informacion y modificarlo.</h5>
+							<h3 style="color:#6A2E98;" class="header-title m-t-0"> Busqueda un solo producto</h3>
+							<h5 > <i class="mdi mdi-information-outline"></i> Ingrese en el buscador el codigo o el nombre de cualquier producto registrado para ver toda su informacion y eliminarlo.</h5>
 						</div>
 					</div>
 					<div class="row">
@@ -151,7 +156,7 @@ ob_end_clean();
 							<select class="js-example-basic-single" name="state" style="width:100%">
 								<option value=""></option>
 								<?php
-								fill_search_mod_usr();
+								fill_search_prod();
 								?>
 							</select>
 						</div>
@@ -161,145 +166,82 @@ ob_end_clean();
 					<div id="tabla_div">
 						<div class="row">
 							<div class= "col-lg-12">
-								<h3 style="color:#6A2E98;" class="header-title m-t-0"> Todos los usuario registrados</h3>
-								<h5 > <i class="mdi mdi-information-outline"></i> Haga click en cualquier usuario para ver toda su informacion y modificarlo.</h5>
+								<h3 style="color:#6A2E98;" class="header-title m-t-0"> Todos los productos registrados</h3>
+								<h5 > <i class="mdi mdi-information-outline"></i> Haga click en cualquier producto para ver toda su informacion y eliminarlo.</h5>
 							</div>
 
 						</div>
 						<div id="table_cont">
 							<table id="exampletable" class="table table-striped table-bordered dataTable no-footer dtr-inline" cellspacing="0" width="100%">
 						    	<?php
-						    		fill_datatable_usr_mod();
+						    		fill_datatable_prod();
 						    	?>
 						    </table>
 						</div>
 					</div>
 
-
 					<div id="contain_form">
-						<form enctype="multipart/form-data" action="user_mod.php" id="usrmod_from" name="test" class="form-validation" novalidate="" method="post" style="display:none;">
+						<form enctype="multipart/form-data" action="stock_new.php" id="testx" name="test" class="form-validation" novalidate="" method="post">
 
-
-							<hr>
-							<div class="form-group">
-								<div class="col-lg-4">
-									<h4>Detalles del empleado con el id</h4>
-								</div>
-								<div class="col-lg-5">
-									<input type="text" name="usr_id" parsley-trigger="change" required="" class="form-control" id="usr_id" readonly value="">
-								</div>
-								<div class="col_lg-3">
-									<a href="user_mod.php"><button type="button" class="btn btn-danger btn-bordered btn-lg" style="width:25%">
-									<i class="ti-back-right"></i>Ver Todos los Usuarios
-									</button></a>
-								</div>
+						<div class="form-group">
+							<label for="prod_cod">Codigo<span class="text-danger">*</span></label>
+							<input type="text" name="prod_cod" parsley-trigger="change" required="" class="form-control" id="prod_cod" value="<?php err_print('prod_cod');?>">
+						</div>
+						<div class="form-group">
+							<label for="prod_name">Nombre<span class="text-danger">*</span></label>
+							<input type="text" name="prod_name" parsley-trigger="change" required="" class="form-control" id="prod_name" value="<?php err_print('prod_name');?>">
+						</div>
+						<div class="form-group">
+							<label for="prod_desc">Descripcion<span class="text-danger"></span></label>
+							<textarea class="form-control" id="prod_desc" name="prod_desc" rows="5"></textarea>	
+						</div>
+						<div class="form-group">
+							<label for="prod_tipo">Tipo<span class="text-danger">*</span></label>
+							<select class="form-control" id="prod_tipo" name="prod_tipo" required="" onchange="updateSize.call(this, event)"">
+								<?php
+									fill_types_clothes();
+								?>
+                            </select>
+						</div>
+						
+						<div class="form-group">
+							<label for="prod_talla">Talla<span class="text-danger">*</span></label>
+							<select class="form-control" id="prod_talla" name="prod_talla" required="">
+								<?php
+									fill_start_size();
+								?>
+							</select>
 							
-							<br>
-							<br>
-							<div class="form-group">
-								<label for="userName">Nombre<span class="text-danger">*</span></label>
-								<input type="text" name="usr_nombre" parsley-trigger="change" required="" class="form-control" id="usr_nombre" value="<?php err_print('usr_nombre');?>">
-							</div>
-							<div class="form-group">
-								<label for="usr_app">Apellido Paterno<span class="text-danger">*</span></label>
-								<input type="text" name="usr_app" parsley-trigger="change" required="" class="form-control" id="usr_app" value="<?php err_print('usr_app');?>">
-							</div>
-							<div class="form-group">
-								<label for="usr_amp">Apellido Materno<span class="text-danger"></span></label>
-								<input type="text" name="usr_apm" parsley-trigger="change" class="form-control" id="usr_apm" value="<?php err_print('usr_apm');?>">
-							</div>
-							<div class="form-group">
-								<label for="datepicker-autoclose">Fecha de Nacimiento<span class="text-danger">*</span></label>
-								<div class="input-group">
-									<input type="text" name="usr_fn" class="form-control" placeholder="mm/dd/yyyy" id="datepicker-autoclose" parsley-trigger="change" required="" value="<?php err_print('usr_fn');?>">
-									<span class="input-group-addon bg-custom b-0"><i class="mdi mdi-calendar text-white"></i></span>
-								</div>
-							</div>
-							<label>Genero<span class="text-danger">*</span></label>
-							<div class="form-group">
-								<div class="radio radio-info radio-inline">
-									<input type="radio" id="usr_ge1" value="M" name="usr_ge" <?php if(isset($_POST["usr_ge"])){if($_POST["usr_ge"]=="M")echo('checked=""');}else{echo('checked=""');}?>>
-									<label for="usr_ge1"> Masculino </label>
-								</div>
-								<div class="radio radio-danger radio-inline">
-									<input type="radio" id="usr_ge2" value="F" name="usr_ge" <?php if(isset($_POST["usr_ge"]))if($_POST["usr_ge"]=="F")echo('checked=""'); ?>>
-									<label for="usr_ge2"> Femenino </label>
-								</div>
-							</div>
-							<label>Fotografia</label>
+						</div>
+						<div class="form-group">
+							<label for="prod_precio">Precio <span class="text-danger">*</span></label>
+							<input type="number" name="prod_precio" class="form-control" min="1" id="prod_precio" style="text-align: left;  padding-right: 10px;" value=1>
+						</div>
+						<div class="form-group">
+							<label for="prod_cant">Cantidad que se ingresan al inventario <span class="text-danger">*</span></label>
+							<input type="number" name="prod_cant" class="form-control" itd="prod_cant" min="1" style="text-align: left;  padding-right: 10px;" value=1>
+						</div>
+						<label>Vista Previa</label>
 							<div class="thumb-xl member-thumb m-b-10 center-block">
-								<img src="usr_img\0.png" id="fotografia" class="img-circle img-thumbnail" alt="profile-image">
+								<img src="prod_img\0.png" id="prev_foto" class="img img-thumbnail" alt="profile-image" >
 							</div>
-							<br>
-							<div class="pull-right">
-								<span class="text-warning"> * No se modificara la imagen si se deja en blanco</span>
-							</div>
-							<br>
-							<div class="form-group m-b-0">
-								<input type="file" class="filestyle" name="userfile" data-buttonname="btn-primary" id="filestyle-5"  tabindex="-1" style="position: absolute; clip: rect(0px 0px 0px 0px);">
-								<div class="bootstrap-filestyle input-group"> 
-									<span class="group-span-filestyle input-group-btn" tabindex="0" id="summmer">
-
-									</span>
-								</div>         
-							</div>
-							<hr>
-							<div class="form-group">
-								<label for="usr_user">Usuario<span class="text-danger">*</span></label>
-								<input type="text" name="usr_user" parsley-trigger="change" required="" placeholder="" class="form-control" id="usr_user">
-							</div>
-							<label>Contraseña</label>
-							<div class="pull-right">
-								<span class="text-danger"> * Cambio de contraseña obligatorio</span>
-							</div>
-							<div class="form-group">
-
-								<input id="pass1" name="usr_pass" type="password" placeholder="Password" required="" class="form-control">
-							</div>
-							<div class="form-group">
-								<label for="usr_pass">Confirmar Contraseña <span class="text-danger">*</span></label>
-								<input data-parsley-equalto="#pass1" type="password" required="" placeholder="Password" class="form-control" id="usr_pass">
-							</div>
-							<label >Nivel<span class="text-danger">*</span></label>
-							<div class="form-group">
-								<div class="radio radio-info radio-inline" onchange="yesnoCheck(this);">
-									<input type="radio" id="usr_niv1" value="1" name="usr_niv" <?php if(isset($_POST["usr_niv"]))if($_POST["usr_niv"]=="1")echo('checked=""'); ?>>
-									<label for="usr_niv1"> Empleado </label>
-								</div>
-								<div class="radio radio-warning radio-inline" onchange="yesnoCheck2(this);">
-									<input type="radio" id="usr_niv2" value="0" name="usr_niv" <?php if(isset($_POST["usr_niv"]))if($_POST["usr_niv"]=="0")echo('checked=""'); ?> >
-									<label for="usr_niv2"> Administrador </label>
-								</div>
-							</div>
-							<div class="form-group" id="emg" style="display:none;">
-								<label for="usr_em">Email (Requerido para Administradores)<span class="text-danger">*</span></label>
-								<input type="email" name="usr_em" parsley-trigger="change" class="form-control" id="usr_em" value="<?php err_print('usr_em');?>">
-							</div>
-							<div class="form-group" id="telf" style="display:none;">
-								<label for="usr_tel">Telefono (Requerido para Administradores)<span class="text-danger">*</span></label>
-								<input type="tel" name="usr_tel" parsley-trigger="change" placeholder="" class="form-control" id="usr_tel">
-							</div>
-							<div class="form-group" id="sum" style="display:none;">
-								<label for="summernote">Biografia<span class="text-danger"></span></label>
-								<fieldset>
-
-									<p class="container">
-										<textarea class="input-block-level" id="summernote" name="content" rows="2">
-										</textarea>
-									</p>
-								</fieldset>
-
-							</div>
-							<hr>
-							<div class="form-group text-right m-b-0">
-								<a href="user_mod.php"><button type="button" class="btn btn-danger btn-bordered btn-lg" style="width:25%">
-									<i class="mdi mdi-close"></i>Cancelar
-								</button></a>
-								<button class="btn btn-primary btn-bordered btn-lg" type="submit" style="width:35%" >
-									<i class="mdi mdi-check"></i>Guardar
-								</button>
-							</div>
-						</form>
+						<label>Fotografia<span class="text-danger"></span></label>
+						<div class="form-group m-b-0">
+							<input type="file" class="filestyle" name="userfile" data-buttonname="btn-primary" id="filestyle-5" tabindex="-1" style="position: absolute; clip: rect(0px 0px 0px 0px);" onchange="readURL(this);">
+							<div class="bootstrap-filestyle input-group">
+								<span class="group-span-filestyle input-group-btn" tabindex="0">
+									
+								</span>
+							</div>         
+						</div>
+						<br>
+						<br>
+						<div class="form-group text-right m-b-0">
+							<button class="btn btn-primary btn-bordered btn-lg" type="submit" style="width:35%" >
+								<i class="mdi mdi-check"></i>Guardar
+							</button>
+						</div>
+					</form>
 					</div>
 				</div>
 
@@ -382,21 +324,50 @@ ob_end_clean();
 	<script src="assets/plugins/datatables/dataTables.colVis.js"></script>
 	<script src="assets/plugins/datatables/dataTables.fixedColumns.min.js"></script>
 
-	<!-- init -->
-	<script src="assets/pages/jquery.datatables.init.js"></script>
+
+    <!-- Sweet-Alert  -->
+    <script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
 
 
 	<!-- App Js -->
 	<script src="assets/js/jquery.app.js"></script>
 
+			<script>
+			
+				$(document).on('click', '#sub', function(e) {
+			    e.preventDefault();
+			    swal({
+			 		title: "¿Esta seguro que desea eliminar el usuario?",
+			        text: "No podra recuperar la informacion relacionada al usuario",
+			        type: "warning",
+			        showCancelButton: true,
+			        confirmButtonColor: "#DD6B55",
+			        confirmButtonText: "Si",
+			        cancelButtonText: "Cancelar",
+			        closeOnConfirm: false
+			    }).then(function (result) {
+			        $('#usrmod_from').submit();
+			    });
+			});
 
-
+		</script>
 	<script>
+			function callFromTable(value){
+				document.getElementById('prod_cod').value= value;
+				document.getElementById("tabla_div").style.display = "none";
+				//document.getElementById('contain_form').scrollIntoView();
+			    $('html, body').animate({
+			        scrollTop: $("#contain_form").offset().top
+			    }, 500);
+				for($i=0;$i<elem.length;$i++)
+					getOutput(value, $i);
+			}
 
 			//Select 2 buscador de nombres y usuarios
-			var elem = ["usr_nombre","usr_app","usr_apm","datepicker-autoclose","usr_user", "usr_em", "usr_tel","usr_niv1","usr_ge2","summernote","fotografia" ]; //Elementos a modificar
+			var elem = ["usr_nombre","usr_app","usr_apm","datepicker-autoclose","usr_user", "usr_em", "usr_tel","usr_niv1","usr_ge2","sum","fotografia"]; //Elementos a modificar
 			$(document).ready(function() {
-				var select2 = $('.js-example-basic-single').select2({ placeholder: "Usuario o nombre completo" });
+				var select2 = $('.js-example-basic-single').select2({ placeholder: "Usuario o Nombre Completo " });
 			});
 			$('.js-example-basic-single').on('change', function() {
 				var $select = $(".js-example-basic-single").parent().find("select"); // it's <select> element
@@ -420,10 +391,8 @@ ob_end_clean();
 			});
 
 
-
-
 			function callFromTable(value){
-				document.getElementById('usr_id').value= value;
+				document.getElementById('prod_cod').value= value;
 				document.getElementById("tabla_div").style.display = "none";
 				//document.getElementById('contain_form').scrollIntoView();
 			    $('html, body').animate({
@@ -433,11 +402,10 @@ ob_end_clean();
 					getOutput(value, $i);
 			}
 
-
 			// handles the click event for link 1, sends the query
 			function getOutput(id,tipo) {
 				getRequest(
-			      'lib/searchbyid.php?id='+id+'&t='+tipo, // URL for the PHP file
+			      'lib/searchbycode_products.php?id='+id+'&t='+tipo, // URL for the PHP file
 			       drawOutput,  // handle successful request
 			       drawError,
 			       tipo  // handle error
@@ -456,7 +424,6 @@ ob_end_clean();
 			function drawOutput(responseText, tipo) {
 				//RADIOBUTTON GENERO
 				elem_id=elem[tipo];
-				
 				if(tipo==8 || tipo==7){
 					responseText=responseText.replace(/(\r\n|\n|\r)/gm,"");
 					if(responseText=="1"){
@@ -473,7 +440,7 @@ ob_end_clean();
 					document.getElementById(elem_id).checked = "true";
 				}else{
 					if(tipo==9){
-						$('textarea[name="content"]').summernote('code',responseText);
+						document.getElementById(elem_id).innerHTML= responseText;
 					}else if(tipo==10){
 						document.getElementById(elem_id).src= responseText;
 					}
@@ -545,8 +512,7 @@ ob_end_clean();
 			var postForm = function() {
 				var content = $('textarea[name="content"]').html($('#summernote').code());
 			}
-
-
 		</script>
+
 	</body>
 	</html>

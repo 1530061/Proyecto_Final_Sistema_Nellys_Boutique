@@ -186,6 +186,8 @@ function fill_search_mod_usr(){
 	for($i=0;$i<count($user_info);$i++){
 		echo('<option value="'.array_values($user_info[$i])[0].'">'.array_values($user_info[$i])[1].'</option>');
 	}
+}
+
 
 function fill_datatable_usr_mod(){
 	echo('
@@ -215,11 +217,11 @@ function fill_datatable_usr_mod(){
 
 			');
 	}
-    echo('</tbody>');
-						    
-	}
-
+    echo('</tbody>');					    
 }
+
+
+
 
 ?>
 

@@ -2,7 +2,7 @@
 session_start();
 include ("lib/db.php");
 include ("lib/misc.php");
-include ("lib/user_control_lib.php");
+include ("lib/stock_lib.php");
 
 if (empty($_SESSION["logg"]))
 	header('Location: /final/index.php');
@@ -94,7 +94,7 @@ ob_end_clean();
 				<!-- Logo and name -->
 				<div class="row" style="height:70px;">
 					<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-						<span class="mdi mdi-account-plus" style="font-size: 60px; padding-left: 10px;" ></span> 
+						<span class="mdi mdi-package-variant" style="font-size: 60px; padding-left: 10px;" ></span> 
 					</div>
 					<div class="col-sm-11 col-md-8 col-lg-11">
 						<h1 style="color:#D52B2B;"> Agregar Producto </h1>
@@ -115,48 +115,58 @@ ob_end_clean();
 						<strong> La imagen excede el tamaño permitido (>8MB)
 						</div>');
 				}
-				if(isset($_POST["usr_nombre"])){
+				if(isset($_POST["prod_cod"])){
 
 					$file=$_FILES['userfile']['name'];
 					$tmp=$_FILES['userfile']['tmp_name'];
 
-					insert_user($file, $tmp);
+					insert_product($file, $tmp);
 				}
 				?>
 				<div class="p-20 m-b-20">
-					<form enctype="multipart/form-data" action="user_new.php" id="testx" name="test" class="form-validation" novalidate="" method="post">
+					<form enctype="multipart/form-data" action="stock_new.php" id="testx" name="test" class="form-validation" novalidate="" method="post">
 
 						<div class="form-group">
-							<label for="userName">Codigo<span class="text-danger">*</span></label>
-							<input type="text" name="usr_nombre" parsley-trigger="change" required="" class="form-control" id="usr_nombre" value="<?php err_print('usr_nombre');?>">
+							<label for="prod_cod">Codigo<span class="text-danger">*</span></label>
+							<input type="text" name="prod_cod" parsley-trigger="change" required="" class="form-control" id="prod_cod" value="<?php err_print('prod_cod');?>">
 						</div>
 						<div class="form-group">
-							<label for="usr_app">Nombre<span class="text-danger">*</span></label>
-							<input type="text" name="usr_app" parsley-trigger="change" required="" class="form-control" id="usr_app" value="<?php err_print('usr_app');?>">
+							<label for="prod_name">Nombre<span class="text-danger">*</span></label>
+							<input type="text" name="prod_name" parsley-trigger="change" required="" class="form-control" id="prod_name" value="<?php err_print('prod_name');?>">
 						</div>
 						<div class="form-group">
-							<label for="usr_amp">Descripcion<span class="text-danger"></span></label>
-							<textarea class="form-control" rows="5"></textarea>	
+							<label for="prod_desc">Descripcion<span class="text-danger"></span></label>
+							<textarea class="form-control" id="prod_desc" name="prod_desc" rows="5"></textarea>	
 						</div>
 						<div class="form-group">
-							<label for="usr_app">Tipo<span class="text-danger">*</span></label>
-							<input type="text" name="usr_app" parsley-trigger="change" required="" class="form-control" id="usr_app" value="<?php err_print('usr_app');?>">
+							<label for="prod_tipo">Tipo<span class="text-danger">*</span></label>
+							<select class="form-control" id="prod_tipo" name="prod_tipo" required="" onchange="updateSize.call(this, event)"">
+								<?php
+									fill_types_clothes();
+								?>
+                            </select>
+						</div>
+						
+						<div class="form-group">
+							<label for="prod_talla">Talla<span class="text-danger">*</span></label>
+							<select class="form-control" id="prod_talla" name="prod_talla" required="">
+								<?php
+									fill_start_size();
+								?>
+							</select>
+							
 						</div>
 						<div class="form-group">
-							<label for="usr_app">Talla<span class="text-danger">*</span></label>
-							<input type="text" name="usr_app" parsley-trigger="change" required="" class="form-control" id="usr_app" value="<?php err_print('usr_app');?>">
+							<label for="prod_precio">Precio <span class="text-danger">*</span></label>
+							<input type="number" name="prod_precio" class="form-control" min="1" id="prod_precio" style="text-align: left;  padding-right: 10px;" value=1>
 						</div>
 						<div class="form-group">
-							<label for="usr_app">Precio <span class="text-danger">*</span></label>
-							<input type="number" name="quantity" class="form-control" min="1" style="text-align: left;  padding-right: 10px;" value=1>
-						</div>
-						<div class="form-group">
-							<label for="usr_app">Cantidad que se ingresan al inventario <span class="text-danger">*</span></label>
-							<input type="number" name="quantity" class="form-control" min="1" style="text-align: left;  padding-right: 10px;" value=1>
+							<label for="prod_cant">Cantidad que se ingresan al inventario <span class="text-danger">*</span></label>
+							<input type="number" name="prod_cant" class="form-control" itd="prod_cant" min="1" style="text-align: left;  padding-right: 10px;" value=1>
 						</div>
 						<label>Vista Previa</label>
 							<div class="thumb-xl member-thumb m-b-10 center-block">
-								<img src="usr_img\0.png" id="prev_foto" class="img img-thumbnail" alt="profile-image" >
+								<img src="prod_img\0.png" id="prev_foto" class="img img-thumbnail" alt="profile-image" >
 							</div>
 						<label>Fotografia<span class="text-danger"></span></label>
 						<div class="form-group m-b-0">
@@ -167,8 +177,10 @@ ob_end_clean();
 								</span>
 							</div>         
 						</div>
+						<br>
+						<br>
 						<div class="form-group text-right m-b-0">
-							<button type="reset" class="btn btn-danger btn-bordered btn-lg" style="width:25%">
+							<button onclick="gotop();" type="reset" class="btn btn-danger btn-bordered btn-lg" style="width:25%">
 								<i class="mdi mdi-close"></i>Cancelar
 							</button>
 							<button class="btn btn-primary btn-bordered btn-lg" type="submit" style="width:35%" >
@@ -248,6 +260,7 @@ ob_end_clean();
 	<!-- App Js -->
 	<script src="assets/js/jquery.app.js"></script>
 
+
 	<script type="text/javascript">
         function readURL(input) {
             if (input.files && input.files[0]) {
@@ -263,6 +276,12 @@ ob_end_clean();
     </script>
 
 	<script>
+
+		function updateSize(event) {
+			id=this.options[this.selectedIndex].value;
+			getOutput(id);
+		    
+		}
 		function yesnoCheck(that) {
 			document.getElementById("emg").style.display = "none";
 			document.getElementById("telf").style.display = "none";
@@ -290,10 +309,69 @@ ob_end_clean();
 				height: "170px"
 			});
 		});
-		var postForm = function() {
-			var content = $('textarea[name="content"]').html($('#summernote').code());
+	
+		function getOutput(id) {
+			getRequest(
+		      'lib/searchsize.php?id_tipo='+id, // URL for the PHP file
+		       drawOutput,  // handle successful request
+		       drawError,
+		       id  // handle error
+		       );
+			return false;
+		}  
+
+		// handles drawing an error message
+		function drawError() {
+			var container = document.getElementById('output');
+			container.innerHTML = 'Bummer: there was an error!';
+		}
+		
+		function gotop(){
+		    $('html, body').animate({
+		        scrollTop: $("#page-right-content").offset().top
+		    }, 500);
+		}
+		// handles the response, adds the html
+		function drawOutput(responseText, id) {
+			console.log(responseText);
+			//RADIOBUTTON GENER			
+			$("#prod_talla").html(responseText);
+			//var list = document.getElementById(prod_talla);
+			//list.innerHTML= responseText;
+			
+		}
+		// helper function for cross-browser request object
+		function getRequest(url, success, error, tipo) {
+			var req = false;
+			try{
+		        // most browsers
+		        req = new XMLHttpRequest();
+		    } catch (e){
+		        // IE
+		        try{
+		        	req = new ActiveXObject("Msxml2.XMLHTTP");
+		        } catch(e) {
+		            // try an older version
+		            try{
+		            	req = new ActiveXObject("Microsoft.XMLHTTP");
+		            } catch(e) {
+		            	return false;
+		            }
+		        }
+		    }
+		    if (!req) return false;
+		    if (typeof success != 'function') success = function () {};
+		    if (typeof error!= 'function') error = function () {};
+		    req.onreadystatechange = function(){
+		    	if(req.readyState == 4) {
+		    		return req.status === 200 ? 
+		    		success(req.responseText, id) : error(req.status);
+		    	}
+		    }
+		    req.open("GET", url, true);
+		    req.send(null);
+		    return req;
 		}
 	</script>
-
 </body>
 </html>

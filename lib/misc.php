@@ -207,7 +207,9 @@ function page_print_leftsidemenu(){
 		<li class="">
 			<a href="javascript: void(0);" aria-expanded="false"><i class="mdi mdi-package-variant-closed"></i> Gestion de Inventario <span class="fa arrow"></span></a>
 			<ul class="nav-second-level nav collapse" aria-expanded="false" style="height: 0px;">
-				<li><a href="stock_new.php" aria-expanded="true"><i class="mdi mdi-account-plus"></i> Agregar Producto </a></li>
+				<li><a href="stock_new.php" aria-expanded="true"><i class="mdi mdi-package-variant"></i> Agregar Producto </a></li>
+				<li><a href="stock_del.php" aria-expanded="true"><i class="mdi mdi-package-variant"></i> Eliminar Producto </a></li>
+				<li><a href="stock_mod.php" aria-expanded="true"><i class="mdi mdi-package-variant"></i> Modificar Producto </a></li>
 			</ul>
 		</li>
 

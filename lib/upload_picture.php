@@ -43,4 +43,18 @@
 		print "</pre>";*/
 		return ("usr_img"."\\\\".$filename.".". get_extension($_FILES['userfile']['name']));
 	}
+
+	function upload_product($file, $tmp, $newname){
+		$filename=$newname;
+		$uploaddir = $_SERVER['SCRIPT_FILENAME'];
+		$uploaddir = dirname($uploaddir).'/prod_img/';
+
+		$uploadfile = $uploaddir . $filename.'.'. get_extension($_FILES['userfile']['name']);
+		
+		$tmpdir=$_FILES['userfile']['tmp_name'];
+
+		move_uploaded_file($tmpdir, $uploadfile);
+
+		return ("prod_img"."\\\\".$filename.".". get_extension($_FILES['userfile']['name']));
+	}
 ?> 
