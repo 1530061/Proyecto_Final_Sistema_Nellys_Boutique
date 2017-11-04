@@ -107,10 +107,10 @@ ob_end_clean();
 				<!-- Logo and name -->
 				<div class="row" style="height:70px;">
 					<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-						<span class="mdi mdi-account-remove" style="font-size: 60px; padding-left: 10px;" ></span> 
+						<span class="mdi mdi-delete-forever" style="font-size: 60px; padding-left: 10px;" ></span> 
 					</div>
 					<div class="col-sm-11 col-md-8 col-lg-11">
-						<h1 style="color:#D52B2B;"> Eliminar Usuario </h1>
+						<h1 style="color:#D52B2B;"> Eliminar Producto </h1>
 					</div>
 
 				</div>
@@ -118,15 +118,8 @@ ob_end_clean();
 
 
 				<?php
-				$tabla=select("select p.codigo, p.nombre, p.descripcion, tp.nombre, t.talla, p.cantidad_stock from producto p inner join tipo_producto tp on tp.id = p.id_tipo inner join talla t on p.id_talla=t.id where activo=1");
-				for($i=0;$i<sizeof($tabla);$i++){
-					for($j=0;$j<sizeof($tabla[0]);$j++){
-						echo(array_values($tabla[$i])[$j]);
-						echo('   ');
-					}
-					echo('<br>');
 
-				}
+
 				if($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) &&
 					empty($_FILES) && $_SERVER['CONTENT_LENGTH'] > 0)
 				{
@@ -138,8 +131,10 @@ ob_end_clean();
 						</div>');
 				}
 				if(isset($_POST["prod_cod"])){
-
-					//delete_user();
+					
+				
+					delete_product();
+					
 					//$values=[$_POST["name"],$_POST["usr"],$_POST["p"];
 					
 				}
@@ -148,7 +143,7 @@ ob_end_clean();
 					<div class="row">
 						<div class= "col-lg-12">
 							<h3 style="color:#6A2E98;" class="header-title m-t-0"> Busqueda un solo producto</h3>
-							<h5 > <i class="mdi mdi-information-outline"></i> Ingrese en el buscador el codigo o el nombre de cualquier producto registrado para ver toda su informacion y eliminarlo.</h5>
+							<h5 > <i class="mdi mdi-information-outline"></i> Ingrese en el buscador el codigo o el nombre de cualquier producto registrado para ver toda su informacion y modificarlo.</h5>
 						</div>
 					</div>
 					<div class="row">
@@ -167,7 +162,7 @@ ob_end_clean();
 						<div class="row">
 							<div class= "col-lg-12">
 								<h3 style="color:#6A2E98;" class="header-title m-t-0"> Todos los productos registrados</h3>
-								<h5 > <i class="mdi mdi-information-outline"></i> Haga click en cualquier producto para ver toda su informacion y eliminarlo.</h5>
+								<h5 > <i class="mdi mdi-information-outline"></i> Haga click en cualquier producto para ver toda su informacion y modificarlo.</h5>
 							</div>
 
 						</div>
@@ -181,23 +176,40 @@ ob_end_clean();
 					</div>
 
 					<div id="contain_form">
-						<form enctype="multipart/form-data" action="stock_new.php" id="testx" name="test" class="form-validation" novalidate="" method="post">
+						<form enctype="multipart/form-data" action="stock_del.php" id="prodmod_from" name="prodmod_from" class="form-validation" novalidate="" method="post" style="display:none;">
 
+							<hr>
+							<div class="form-group">
+								<div class="col-lg-4">
+									<h4>Detalles del producto con el codigo</h4>
+								</div>
+								<div class="col-lg-5">
+									<input type="text" name="prod_cod" parsley-trigger="change" required="" class="form-control" id="prod_cod" readonly value="<?php err_print('prod_cod');?>">
+								</div>
+								<div class="col_lg-3">
+									<a href="stock_del.php"><button type="button" class="btn btn-danger btn-bordered btn-lg" style="width:25%">
+									<i class="ti-back-right"></i>Ver Todos los productos
+									</button></a>
+								</div>
+							
+							<br>
+
+							<!--
 						<div class="form-group">
 							<label for="prod_cod">Codigo<span class="text-danger">*</span></label>
 							<input type="text" name="prod_cod" parsley-trigger="change" required="" class="form-control" id="prod_cod" value="<?php err_print('prod_cod');?>">
-						</div>
+						</div>-->
 						<div class="form-group">
 							<label for="prod_name">Nombre<span class="text-danger">*</span></label>
-							<input type="text" name="prod_name" parsley-trigger="change" required="" class="form-control" id="prod_name" value="<?php err_print('prod_name');?>">
+							<input type="text" name="prod_name" parsley-trigger="change" required="" class="form-control" readonly id="prod_name" value="<?php err_print('prod_name');?>">
 						</div>
 						<div class="form-group">
 							<label for="prod_desc">Descripcion<span class="text-danger"></span></label>
-							<textarea class="form-control" id="prod_desc" name="prod_desc" rows="5"></textarea>	
+							<textarea class="form-control" id="prod_desc" name="prod_desc" readonly rows="5"></textarea>	
 						</div>
 						<div class="form-group">
 							<label for="prod_tipo">Tipo<span class="text-danger">*</span></label>
-							<select class="form-control" id="prod_tipo" name="prod_tipo" required="" onchange="updateSize.call(this, event)"">
+							<select class="form-control" id="prod_tipo" name="prod_tipo" required="" readonly onchange="updateSize.call(this, event)"">
 								<?php
 									fill_types_clothes();
 								?>
@@ -206,7 +218,7 @@ ob_end_clean();
 						
 						<div class="form-group">
 							<label for="prod_talla">Talla<span class="text-danger">*</span></label>
-							<select class="form-control" id="prod_talla" name="prod_talla" required="">
+							<select class="form-control" id="prod_talla" readonly name="prod_talla" required="">
 								<?php
 									fill_start_size();
 								?>
@@ -215,30 +227,25 @@ ob_end_clean();
 						</div>
 						<div class="form-group">
 							<label for="prod_precio">Precio <span class="text-danger">*</span></label>
-							<input type="number" name="prod_precio" class="form-control" min="1" id="prod_precio" style="text-align: left;  padding-right: 10px;" value=1>
+							<input type="number" name="prod_precio" class="form-control" min="1" readonly id="prod_precio" style="text-align: left;  padding-right: 10px;" value=1>
 						</div>
 						<div class="form-group">
-							<label for="prod_cant">Cantidad que se ingresan al inventario <span class="text-danger">*</span></label>
-							<input type="number" name="prod_cant" class="form-control" itd="prod_cant" min="1" style="text-align: left;  padding-right: 10px;" value=1>
+							<label for="prod_cant">Cantidad en inventario <span class="text-danger">*</span></label>
+							<input type="number" name="prod_cant" class="form-control" readonly id="prod_cant" min="1" style="text-align: left;  padding-right: 10px;" value=1>
 						</div>
-						<label>Vista Previa</label>
+						<label>Fotografia</label>
+						<div class="form-group">
+							
 							<div class="thumb-xl member-thumb m-b-10 center-block">
-								<img src="prod_img\0.png" id="prev_foto" class="img img-thumbnail" alt="profile-image" >
+								<h6 style="padding-left:10px;"> Imagen Actual </h6>
+								<img src="prod_img\0.png" id="fotografia" class="img img-thumbnail" readonly style="max-height:150px" alt="FORMATO NO SOPORTADO, SELECCIONE NUEVA FOTO">
 							</div>
-						<label>Fotografia<span class="text-danger"></span></label>
-						<div class="form-group m-b-0">
-							<input type="file" class="filestyle" name="userfile" data-buttonname="btn-primary" id="filestyle-5" tabindex="-1" style="position: absolute; clip: rect(0px 0px 0px 0px);" onchange="readURL(this);">
-							<div class="bootstrap-filestyle input-group">
-								<span class="group-span-filestyle input-group-btn" tabindex="0">
-									
-								</span>
-							</div>         
+							
 						</div>
-						<br>
 						<br>
 						<div class="form-group text-right m-b-0">
-							<button class="btn btn-primary btn-bordered btn-lg" type="submit" style="width:35%" >
-								<i class="mdi mdi-check"></i>Guardar
+							<button class="btn btn-danger btn-bordered btn-lg" id="sub" type="submit" style="width:35%" >
+								<i class="fa fa-remove"></i>Eliminar
 							</button>
 						</div>
 					</form>
@@ -333,52 +340,44 @@ ob_end_clean();
 	<!-- App Js -->
 	<script src="assets/js/jquery.app.js"></script>
 
-			<script>
-			
-				$(document).on('click', '#sub', function(e) {
-			    e.preventDefault();
-			    swal({
-			 		title: "¿Esta seguro que desea eliminar el usuario?",
-			        text: "No podra recuperar la informacion relacionada al usuario",
-			        type: "warning",
-			        showCancelButton: true,
-			        confirmButtonColor: "#DD6B55",
-			        confirmButtonText: "Si",
-			        cancelButtonText: "Cancelar",
-			        closeOnConfirm: false
-			    }).then(function (result) {
-			        $('#usrmod_from').submit();
-			    });
-			});
-
-		</script>
 	<script>
-			function callFromTable(value){
-				document.getElementById('prod_cod').value= value;
-				document.getElementById("tabla_div").style.display = "none";
-				//document.getElementById('contain_form').scrollIntoView();
-			    $('html, body').animate({
-			        scrollTop: $("#contain_form").offset().top
-			    }, 500);
-				for($i=0;$i<elem.length;$i++)
-					getOutput(value, $i);
-			}
+		
+			$(document).on('click', '#sub', function(e) {
+		    e.preventDefault();
+		    swal({
+		 		title: "¿Esta seguro que desea eliminar el producto?",
+		        text: "No podra recuperar la informacion relacionada con el producto",
+		        type: "warning",
+		        showCancelButton: true,
+		        confirmButtonColor: "#DD6B55",
+		        confirmButtonText: "Si",
+		        cancelButtonText: "Cancelar",
+		        closeOnConfirm: false
+		    }).then(function (result) {
+		        $('#prodmod_from').submit();
+		    });
+		});
+
+	</script>
+
+	<script>
+
 
 			//Select 2 buscador de nombres y usuarios
-			var elem = ["usr_nombre","usr_app","usr_apm","datepicker-autoclose","usr_user", "usr_em", "usr_tel","usr_niv1","usr_ge2","sum","fotografia"]; //Elementos a modificar
+			 //Elementos a modificar
 			$(document).ready(function() {
-				var select2 = $('.js-example-basic-single').select2({ placeholder: "Usuario o Nombre Completo " });
+				var select2 = $('.js-example-basic-single').select2({ placeholder: "Codigo o Nombre del Producto " });
 			});
 			$('.js-example-basic-single').on('change', function() {
 				var $select = $(".js-example-basic-single").parent().find("select"); // it's <select> element
 				var value = $select.val(); 
 				document.getElementById("tabla_div").style.display = "none";
-				document.getElementById('usr_id').value= value;
+				document.getElementById('prod_cod').value= value;
 				$('html, body').animate({
 			        scrollTop: $("#contain_form").offset().top
 			    }, 500);
 				for($i=0;$i<elem.length;$i++)
-					getOutput(value, $i);
+					getOutput("'"+value+"'", $i);
 			})
 
 			$(document).ready(function() {
@@ -390,7 +389,7 @@ ob_end_clean();
 				});
 			});
 
-
+			var elem = ["prod_name","prod_desc","prod_tipo","prod_talla","prod_precio", "prod_cant", "fotografia"];
 			function callFromTable(value){
 				document.getElementById('prod_cod').value= value;
 				document.getElementById("tabla_div").style.display = "none";
@@ -398,14 +397,15 @@ ob_end_clean();
 			    $('html, body').animate({
 			        scrollTop: $("#contain_form").offset().top
 			    }, 500);
-				for($i=0;$i<elem.length;$i++)
-					getOutput(value, $i);
+				for($i=0;$i<elem.length;$i++){
+					getOutput("'"+value+"'", $i);
+				}
 			}
 
 			// handles the click event for link 1, sends the query
 			function getOutput(id,tipo) {
 				getRequest(
-			      'lib/searchbycode_products.php?id='+id+'&t='+tipo, // URL for the PHP file
+			      'lib/searchbycode_products.php?id="'+id+'"&t='+tipo, // URL for the PHP file
 			       drawOutput,  // handle successful request
 			       drawError,
 			       tipo  // handle error
@@ -419,34 +419,25 @@ ob_end_clean();
 				container.innerHTML = 'Bummer: there was an error!';
 			}
 			
-			
+			var responsePrevTipo;
 			// handles the response, adds the html
 			function drawOutput(responseText, tipo) {
 				//RADIOBUTTON GENERO
 				elem_id=elem[tipo];
-				if(tipo==8 || tipo==7){
-					responseText=responseText.replace(/(\r\n|\n|\r)/gm,"");
-					if(responseText=="1"){
-						elem_id="usr_niv1";
-						yesnoCheck();
-					}else if(responseText=="0"){
-						elem_id="usr_niv2";
-						yesnoCheck2();
-					}else if(responseText=="M"){
-						elem_id="usr_ge1";
-					}else{
-						elem_id="usr_ge2";
-					}
-					document.getElementById(elem_id).checked = "true";
+				if(tipo==2){
+					document.getElementById(elem_id).value= responseText;
+					//getOutput2(responseText);
+					responsePrevTipo=responseText;
+				}else if(tipo==3){
+					console.log(responseText);
+					getOutput2(responsePrevTipo, responseText);
+					//document.getElementById(elem_id).value=responseText;
+				}else if(tipo==6){
+					document.getElementById(elem_id).src= responseText;
 				}else{
-					if(tipo==9){
-						document.getElementById(elem_id).innerHTML= responseText;
-					}else if(tipo==10){
-						document.getElementById(elem_id).src= responseText;
-					}
-					else
-						document.getElementById(elem_id).value= responseText;
+					document.getElementById(elem_id).value= responseText;
 				}
+				
 			}
 			// helper function for cross-browser request object
 			function getRequest(url, success, error, tipo) {
@@ -478,7 +469,7 @@ ob_end_clean();
 			    }
 			    req.open("GET", url, true);
 			    req.send(null);
-			    document.getElementById("usrmod_from").style.display="block";
+			    document.getElementById("prodmod_from").style.display="block";
 			    return req;
 			}
 
@@ -512,6 +503,63 @@ ob_end_clean();
 			var postForm = function() {
 				var content = $('textarea[name="content"]').html($('#summernote').code());
 			}
+
+
+		function getOutput2(id,talla) {
+			getRequest2(
+		      'lib/searchsize.php?id_tipo='+id+'&talla='+talla, // URL for the PHP file
+		       drawOutput2,  // handle successful request
+		       drawError,
+		       id  // handle error
+		       );
+			return false;
+		}  
+
+		// handles drawing an error message
+		function updateSize(event) {
+			id=this.options[this.selectedIndex].value;
+			getOutput2(id);
+		    
+		}
+
+		// handles the response, adds the html
+		function drawOutput2(responseText) {
+			$("#prod_talla").html(responseText);
+
+			
+		}
+		// helper function for cross-browser request object
+		function getRequest2(url, success, error, tipo) {
+			var req = false;
+			try{
+		        // most browsers
+		        req = new XMLHttpRequest();
+		    } catch (e){
+		        // IE
+		        try{
+		        	req = new ActiveXObject("Msxml2.XMLHTTP");
+		        } catch(e) {
+		            // try an older version
+		            try{
+		            	req = new ActiveXObject("Microsoft.XMLHTTP");
+		            } catch(e) {
+		            	return false;
+		            }
+		        }
+		    }
+		    if (!req) return false;
+		    if (typeof success != 'function') success = function () {};
+		    if (typeof error!= 'function') error = function () {};
+		    req.onreadystatechange = function(){
+		    	if(req.readyState == 4) {
+		    		return req.status === 200 ? 
+		    		success(req.responseText) : error(req.status);
+		    	}
+		    }
+		    req.open("GET", url, true);
+		    req.send(null);
+		    return req;
+		}
 		</script>
 
 	</body>

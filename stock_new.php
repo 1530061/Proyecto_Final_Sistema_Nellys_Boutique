@@ -166,7 +166,7 @@ ob_end_clean();
 						</div>
 						<label>Vista Previa</label>
 							<div class="thumb-xl member-thumb m-b-10 center-block">
-								<img src="prod_img\0.png" id="prev_foto" class="img img-thumbnail" alt="profile-image" >
+								<img src="prod_img\0.png" id="prev_foto" class="img img-thumbnail" style="max-height:130px" alt="profile-image" >
 							</div>
 						<label>Fotografia<span class="text-danger"></span></label>
 						<div class="form-group m-b-0">

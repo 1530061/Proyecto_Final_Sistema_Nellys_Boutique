@@ -223,10 +223,11 @@ ob_end_clean();
 							<label>Fotografia</label>
 							<div>
 								<div class="thumb-xl member-thumb m-b-10 center-block">
-									<img src="usr_img\0.png" id="fotografia" class="img-circle img-thumbnail" alt="profile-image">
+									<img src="usr_img\0.png" id="fotografia" class="img-circle img-thumbnail" style="max-height:150px" alt="profile-image">
 								</div>
 													
 							</div>
+							<br>
 							<hr>
 							<div class="form-group">
 								<label for="usr_user">Usuario<span class="text-danger">*</span></label>

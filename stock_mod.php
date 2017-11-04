@@ -107,7 +107,7 @@ ob_end_clean();
 				<!-- Logo and name -->
 				<div class="row" style="height:70px;">
 					<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-						<span class="mdi mdi-account-remove" style="font-size: 60px; padding-left: 10px;" ></span> 
+						<span class="mdi mdi-autorenew" style="font-size: 60px; padding-left: 10px;" ></span> 
 					</div>
 					<div class="col-sm-11 col-md-8 col-lg-11">
 						<h1 style="color:#D52B2B;"> Modificar Producto </h1>
@@ -131,8 +131,12 @@ ob_end_clean();
 						</div>');
 				}
 				if(isset($_POST["prod_cod"])){
+					
+					$file=$_FILES['userfile']['name'];
+					$tmp=$_FILES['userfile']['tmp_name'];
 
-					//delete_user();
+					update_prod($file, $tmp);
+					
 					//$values=[$_POST["name"],$_POST["usr"],$_POST["p"];
 					
 				}
@@ -174,12 +178,29 @@ ob_end_clean();
 					</div>
 
 					<div id="contain_form">
-						<form enctype="multipart/form-data" action="stock_new.php" id="testx" name="test" class="form-validation" novalidate="" method="post">
+						<form enctype="multipart/form-data" action="stock_mod.php" id="prodmod_from" name="prodmod_from" class="form-validation" novalidate="" method="post" style="display:none;">
 
+							<hr>
+							<div class="form-group">
+								<div class="col-lg-4">
+									<h4>Detalles del producto con el codigo</h4>
+								</div>
+								<div class="col-lg-5">
+									<input type="text" name="prod_cod" parsley-trigger="change" required="" class="form-control" id="prod_cod" readonly value="<?php err_print('prod_cod');?>">
+								</div>
+								<div class="col_lg-3">
+									<a href="stock_mod.php"><button type="button" class="btn btn-danger btn-bordered btn-lg" style="width:25%">
+									<i class="ti-back-right"></i>Ver Todos los productos
+									</button></a>
+								</div>
+							
+							<br>
+
+							<!--
 						<div class="form-group">
 							<label for="prod_cod">Codigo<span class="text-danger">*</span></label>
 							<input type="text" name="prod_cod" parsley-trigger="change" required="" class="form-control" id="prod_cod" value="<?php err_print('prod_cod');?>">
-						</div>
+						</div>-->
 						<div class="form-group">
 							<label for="prod_name">Nombre<span class="text-danger">*</span></label>
 							<input type="text" name="prod_name" parsley-trigger="change" required="" class="form-control" id="prod_name" value="<?php err_print('prod_name');?>">
@@ -211,24 +232,30 @@ ob_end_clean();
 							<input type="number" name="prod_precio" class="form-control" min="1" id="prod_precio" style="text-align: left;  padding-right: 10px;" value=1>
 						</div>
 						<div class="form-group">
-							<label for="prod_cant">Cantidad que se ingresan al inventario <span class="text-danger">*</span></label>
+							<label for="prod_cant">Cantidad de productos en el inventario<span class="text-danger">*</span></label>
 							<input type="number" name="prod_cant" class="form-control" id="prod_cant" min="1" style="text-align: left;  padding-right: 10px;" value=1>
 						</div>
 						<label>Fotografia</label>
+												<div class="pull-right">
+							<span class="text-warning"> * No se modificara la imagen si se deja en blanco</span>
+						</div>
 							<div class="row">
 								<div class="col-lg-6">
 									<div class="thumb-xl member-thumb m-b-10 center-block">
 										<h6 style="padding-left:10px;"> Imagen Actual </h6>
-										<img src="prod_img\0.png" id="fotografia" class="img-circle img-thumbnail" alt="FORMATO NO SOPORTADO, SELECCIONE NUEVA FOTO">
+										<img src="prod_img\0.png" id="fotografia" class="img img-thumbnail" style="max-height:150px" alt="FORMATO NO SOPORTADO, SELECCIONE NUEVA FOTO">
 									</div>
 								</div>
 								<div class="col-lg-6">
 									<div class="thumb-xl member-thumb m-b-10 center-block">
 										<h6 style="padding-left:10px;""> Vista Previa </h6>
-										<img src="prod_img\0.png" id="prev_foto" class="img-circle img-thumbnail" alt="FORMATO NO SOPORTADO, SELECCIONE NUEVA FOTO">
+										<img src="prod_img\0.png" id="prev_foto" class="img img-thumbnail" style="max-height:150px" alt="FORMATO NO SOPORTADO, SELECCIONE NUEVA FOTO">
 									</div>
 								</div>
 						</div>
+						<br>
+						<br>
+						<br>
 						<div class="form-group m-b-0">
 							<input type="file" class="filestyle" name="userfile" data-buttonname="btn-primary" id="filestyle-5" tabindex="-1" style="position: absolute; clip: rect(0px 0px 0px 0px);" onchange="readURL(this);">
 							<div class="bootstrap-filestyle input-group">
@@ -357,14 +384,13 @@ ob_end_clean();
 			//Select 2 buscador de nombres y usuarios
 			 //Elementos a modificar
 			$(document).ready(function() {
-				var select2 = $('.js-example-basic-single').select2({ placeholder: "Usuario o Nombre Completo " });
+				var select2 = $('.js-example-basic-single').select2({ placeholder: "Codigo o Nombre del Producto " });
 			});
 			$('.js-example-basic-single').on('change', function() {
 				var $select = $(".js-example-basic-single").parent().find("select"); // it's <select> element
 				var value = $select.val(); 
 				document.getElementById("tabla_div").style.display = "none";
 				document.getElementById('prod_cod').value= value;
-				alert(value);
 				$('html, body').animate({
 			        scrollTop: $("#contain_form").offset().top
 			    }, 500);
@@ -384,7 +410,7 @@ ob_end_clean();
 			var elem = ["prod_name","prod_desc","prod_tipo","prod_talla","prod_precio", "prod_cant", "fotografia"];
 			function callFromTable(value){
 				document.getElementById('prod_cod').value= value;
-				//document.getElementById("tabla_div").style.display = "none";
+				document.getElementById("tabla_div").style.display = "none";
 				//document.getElementById('contain_form').scrollIntoView();
 			    $('html, body').animate({
 			        scrollTop: $("#contain_form").offset().top
@@ -411,17 +437,18 @@ ob_end_clean();
 				container.innerHTML = 'Bummer: there was an error!';
 			}
 			
-			
+			var responsePrevTipo;
 			// handles the response, adds the html
 			function drawOutput(responseText, tipo) {
 				//RADIOBUTTON GENERO
 				elem_id=elem[tipo];
 				if(tipo==2){
 					document.getElementById(elem_id).value= responseText;
-					getOutput2(responseText);
+					//getOutput2(responseText);
+					responsePrevTipo=responseText;
 				}else if(tipo==3){
 					console.log(responseText);
-
+					getOutput2(responsePrevTipo, responseText);
 					//document.getElementById(elem_id).value=responseText;
 				}else if(tipo==6){
 					document.getElementById(elem_id).src= responseText;
@@ -460,7 +487,7 @@ ob_end_clean();
 			    }
 			    req.open("GET", url, true);
 			    req.send(null);
-			    //document.getElementById("usrmod_from").style.display="block";
+			    document.getElementById("prodmod_from").style.display="block";
 			    return req;
 			}
 
@@ -496,9 +523,9 @@ ob_end_clean();
 			}
 
 
-		function getOutput2(id) {
+		function getOutput2(id,talla) {
 			getRequest2(
-		      'lib/searchsize.php?id_tipo='+id, // URL for the PHP file
+		      'lib/searchsize.php?id_tipo='+id+'&talla='+talla, // URL for the PHP file
 		       drawOutput2,  // handle successful request
 		       drawError,
 		       id  // handle error

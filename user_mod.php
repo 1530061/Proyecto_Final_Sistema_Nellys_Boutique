@@ -231,16 +231,18 @@ ob_end_clean();
 								<div class="col-lg-6">
 									<div class="thumb-xl member-thumb m-b-10 center-block">
 										<h6 style="padding-left:10px;"> Imagen Actual </h6>
-										<img src="usr_img\0.png" id="fotografia" class="img-circle img-thumbnail" alt="FORMATO NO SOPORTADO, SELECCIONE NUEVA FOTO">
+										<img src="usr_img\0.png" id="fotografia" class="img-circle img-thumbnail" style="max-height:150px" alt="FORMATO NO SOPORTADO, SELECCIONE NUEVA FOTO">
 									</div>
 								</div>
 								<div class="col-lg-6">
 									<div class="thumb-xl member-thumb m-b-10 center-block">
 										<h6 style="padding-left:10px;""> Vista Previa </h6>
-										<img src="usr_img\0.png" id="prev_foto" class="img-circle img-thumbnail" alt="FORMATO NO SOPORTADO, SELECCIONE NUEVA FOTO">
+										<img src="usr_img\0.png" id="prev_foto" class="img-circle img-thumbnail" style="max-height:150px" alt="FORMATO NO SOPORTADO, SELECCIONE NUEVA FOTO">
 									</div>
 								</div>
 							</div>
+							<br>
+							<br>
 							<br>
 							<div class="pull-right">
 								<span class="text-warning"> * No se modificara la imagen si se deja en blanco</span>
