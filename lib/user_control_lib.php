@@ -45,6 +45,10 @@ function update_user($file, $tmp){
 				    }
 
 				    if(count($errors) === 0) {
+				    	$filepath=array_values(select("select fotografia from usuario where id=".$id)[0])[0];
+						if($filepath!='usr_img\0.png' && substr($filepath,0,8)=='usr_img\\'){
+							unlink($filepath);
+						}
 				    	update($columns, $values, "usuario", "where id=".$id);
 				    	include 'upload_picture.php';
 				    	$fileloc=upload($file,$tmp, $id);
@@ -183,7 +187,37 @@ function fill_search_mod_usr(){
 		echo('<option value="'.array_values($user_info[$i])[0].'">'.array_values($user_info[$i])[1].'</option>');
 	}
 
+function fill_datatable_usr_mod(){
+	echo('
+	 <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre Completo</th>
+            <th>Usuario</th>
+            <th>Fecha Nacimiento</th>
+            <th>Email</th>
+            <th>Nivel</th>
+        </tr>
+    </thead>
+    <tbody>
+    ');
+    $user_table = select("select id, CONCAT(nombre,' ',apellido_paterno,' ', apellido_materno), user, fecha_nac, email, nivel from usuario where activo=1 and id!=".$_SESSION['id']);
+    for($i=0;$i<count($user_table);$i++){
+    	$nivel = (array_values($user_table[$i])[5]=="1")?"Empleado":"Administrador";
+		echo('
+			<tr onclick="callFromTable('.array_values($user_table[$i])[0].');">
+			<td>'.array_values($user_table[$i])[0].'</td>
+			<td>'.array_values($user_table[$i])[1].'</td>
+			<td>'.array_values($user_table[$i])[2].'</td>
+			<td>'.array_values($user_table[$i])[3].'</td>
+			<td>'.array_values($user_table[$i])[4].'</td>
+			<td>'.$nivel.'</td>
 
+			');
+	}
+    echo('</tbody>');
+						    
+	}
 
 }
 

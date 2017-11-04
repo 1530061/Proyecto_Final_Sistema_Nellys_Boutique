@@ -97,7 +97,7 @@ ob_end_clean();
 						<span class="mdi mdi-account-plus" style="font-size: 60px; padding-left: 10px;" ></span> 
 					</div>
 					<div class="col-sm-11 col-md-8 col-lg-11">
-						<h1 style="color:#D52B2B;"> Agregar Usuario </h1>
+						<h1 style="color:#D52B2B;"> Agregar Producto </h1>
 					</div>
 					<hr>
 				</div>
@@ -127,39 +127,37 @@ ob_end_clean();
 					<form enctype="multipart/form-data" action="user_new.php" id="testx" name="test" class="form-validation" novalidate="" method="post">
 
 						<div class="form-group">
-							<label for="userName">Nombre<span class="text-danger">*</span></label>
+							<label for="userName">Codigo<span class="text-danger">*</span></label>
 							<input type="text" name="usr_nombre" parsley-trigger="change" required="" class="form-control" id="usr_nombre" value="<?php err_print('usr_nombre');?>">
 						</div>
 						<div class="form-group">
-							<label for="usr_app">Apellido Paterno<span class="text-danger">*</span></label>
+							<label for="usr_app">Nombre<span class="text-danger">*</span></label>
 							<input type="text" name="usr_app" parsley-trigger="change" required="" class="form-control" id="usr_app" value="<?php err_print('usr_app');?>">
 						</div>
 						<div class="form-group">
-							<label for="usr_amp">Apellido Materno<span class="text-danger"></span></label>
-							<input type="text" name="usr_apm" parsley-trigger="change" class="form-control" id="usr_apm" value="<?php err_print('usr_apm');?>">
+							<label for="usr_amp">Descripcion<span class="text-danger"></span></label>
+							<textarea class="form-control" rows="5"></textarea>	
 						</div>
 						<div class="form-group">
-							<label for="datepicker-autoclose">Fecha de Nacimiento<span class="text-danger">*</span></label>
-							<div class="input-group">
-								<input type="text" name="usr_fn" class="form-control" placeholder="mm/dd/yyyy" id="datepicker-autoclose" parsley-trigger="change" required="" value="<?php err_print('usr_fn');?>">
-								<span class="input-group-addon bg-custom b-0"><i class="mdi mdi-calendar text-white"></i></span>
-							</div>
+							<label for="usr_app">Tipo<span class="text-danger">*</span></label>
+							<input type="text" name="usr_app" parsley-trigger="change" required="" class="form-control" id="usr_app" value="<?php err_print('usr_app');?>">
 						</div>
-						<label>Genero<span class="text-danger">*</span></label>
 						<div class="form-group">
-							<div class="radio radio-info radio-inline">
-								<input type="radio" id="inlineRadio1" value="M" name="usr_ge" <?php if(isset($_POST["usr_ge"])){if($_POST["usr_ge"]=="M")echo('checked=""');}else{echo('checked=""');}?>>
-								<label for="inlineRadio1"> Masculino </label>
-							</div>
-							<div class="radio radio-danger radio-inline">
-								<input type="radio" id="inlineRadio2" value="F" name="usr_ge" <?php if(isset($_POST["usr_ge"]))if($_POST["usr_ge"]=="F")echo('checked=""'); ?>>
-								<label for="inlineRadio2"> Femenino </label>
-							</div>
+							<label for="usr_app">Talla<span class="text-danger">*</span></label>
+							<input type="text" name="usr_app" parsley-trigger="change" required="" class="form-control" id="usr_app" value="<?php err_print('usr_app');?>">
+						</div>
+						<div class="form-group">
+							<label for="usr_app">Precio <span class="text-danger">*</span></label>
+							<input type="number" name="quantity" class="form-control" min="1" style="text-align: left;  padding-right: 10px;" value=1>
+						</div>
+						<div class="form-group">
+							<label for="usr_app">Cantidad que se ingresan al inventario <span class="text-danger">*</span></label>
+							<input type="number" name="quantity" class="form-control" min="1" style="text-align: left;  padding-right: 10px;" value=1>
 						</div>
 						<label>Vista Previa</label>
-						<div class="thumb-xl member-thumb m-b-10 center-block">
-							<img src="usr_img\0.png" id="prev_foto" class="img-circle img-thumbnail" alt="profile-image" style="max-width:130px; max-height:130px;" >
-						</div>
+							<div class="thumb-xl member-thumb m-b-10 center-block">
+								<img src="usr_img\0.png" id="prev_foto" class="img img-thumbnail" alt="profile-image" >
+							</div>
 						<label>Fotografia<span class="text-danger"></span></label>
 						<div class="form-group m-b-0">
 							<input type="file" class="filestyle" name="userfile" data-buttonname="btn-primary" id="filestyle-5" tabindex="-1" style="position: absolute; clip: rect(0px 0px 0px 0px);" onchange="readURL(this);">
@@ -169,50 +167,6 @@ ob_end_clean();
 								</span>
 							</div>         
 						</div>
-						<hr>
-						<div class="form-group">
-							<label for="usr_user">Usuario<span class="text-danger">*</span></label>
-							<input type="text" name="usr_user" parsley-trigger="change" required="" placeholder="" class="form-control" id="usr_user">
-						</div>
-						<div class="form-group">
-							<label for="pass1">Contraseña<span class="text-danger">*</span></label>
-							<input id="pass1" name="usr_pass" type="password" placeholder="Password" required="" class="form-control">
-						</div>
-						<div class="form-group">
-							<label for="passWord2">Confirmar Contraseña <span class="text-danger">*</span></label>
-							<input data-parsley-equalto="#pass1" type="password" required="" placeholder="Password" class="form-control" id="passWord2">
-						</div>
-						<label >Nivel<span class="text-danger">*</span></label>
-						<div class="form-group">
-							<div class="radio radio-info radio-inline" onchange="yesnoCheck(this);">
-								<input type="radio" id="inlineRadio3" value="1" name="usr_niv" <?php if(isset($_POST["usr_niv"]))if($_POST["usr_niv"]=="1")echo('checked=""'); ?>>
-								<label for="inlineRadio3"> Empleado </label>
-							</div>
-							<div class="radio radio-warning radio-inline" onchange="yesnoCheck2(this);">
-								<input type="radio" id="inlineRadio4" value="0" name="usr_niv" <?php if(isset($_POST["usr_niv"]))if($_POST["usr_niv"]=="0")echo('checked=""'); ?> >
-								<label for="inlineRadio4"> Administrador </label>
-							</div>
-						</div>
-						<div class="form-group" id="emg" style="display:none;">
-							<label for="usr_em">Email (Requerido para Administradores)<span class="text-danger">*</span></label>
-							<input type="email" name="usr_em" parsley-trigger="change" class="form-control" id="usr_em" value="<?php err_print('usr_em');?>">
-						</div>
-						<div class="form-group" id="telf" style="display:none;">
-							<label for="usr_tel">Telefono (Requerido para Administradores)<span class="text-danger">*</span></label>
-							<input type="tel" name="usr_tel" parsley-trigger="change" placeholder="" class="form-control" id="usr_tel">
-						</div>
-						<div class="form-group" id="summer" style="display:none;">
-							<label for="summernote">Biografia<span class="text-danger"></span></label>
-							<fieldset>
-								
-								<p class="container">
-									<textarea class="input-block-level" id="summernote" name="content" rows="2">
-									</textarea>
-								</p>
-							</fieldset>
-							
-						</div>
-						<hr>
 						<div class="form-group text-right m-b-0">
 							<button type="reset" class="btn btn-danger btn-bordered btn-lg" style="width:25%">
 								<i class="mdi mdi-close"></i>Cancelar
@@ -242,6 +196,7 @@ ob_end_clean();
 		<!-- end .page-contentbar -->
 	</div>
 	<!-- End #page-wrapper -->
+
 
 	<!-- js placed at the end of the document so the pages load faster -->
 
@@ -306,7 +261,7 @@ ob_end_clean();
             }
         }
     </script>
-	
+
 	<script>
 		function yesnoCheck(that) {
 			document.getElementById("emg").style.display = "none";

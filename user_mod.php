@@ -39,6 +39,17 @@ ob_end_clean();
 	<link href="assets/plugins/clockpicker/css/bootstrap-clockpicker.min.css" rel="stylesheet">
 	<link href="assets/plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
 
+
+    <!-- DataTables -->
+    <link href="assets/plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/plugins/datatables/dataTables.colVis.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/plugins/datatables/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/plugins/datatables/fixedColumns.dataTables.min.css" rel="stylesheet" type="text/css"/>
+
+
 	<!-- Bootstrap core CSS -->
 	<link href="assets/css/bootstrap.min.css" rel="stylesheet">
 	<!-- MetisMenu CSS -->
@@ -48,6 +59,7 @@ ob_end_clean();
 	<!-- Custom styles for this template -->
 	<link href="assets/css/style.css" rel="stylesheet">
 	<link href="assets/plugins/summernote/summernote.css" rel="stylesheet" />
+
 
 
 
@@ -92,14 +104,16 @@ ob_end_clean();
 			<!-- START PAGE CONTENT -->
 			<div id="page-right-content">
 				<!-- Logo and name -->
-				<div class="row">
-					<div class="col-sm-1 col-md-4 col-lg-1">
-						<span class="ti-home gi-5x" style="font-size: 60px; padding-left: 10px;" ></span> 
+				<div class="row" style="height:70px;">
+					<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
+						<span class="mdi mdi-account-star-variant" style="font-size: 60px; padding-left: 10px;" ></span> 
 					</div>
 					<div class="col-sm-11 col-md-8 col-lg-11">
-						<h1> Tablero </h1>
+						<h1 style="color:#D52B2B;"> Modificar Usuario </h1>
 					</div>
+					<hr>
 				</div>
+
 
 
 
@@ -125,12 +139,15 @@ ob_end_clean();
 				}
 				?>
 				<div class="p-20 m-b-20">
-					<hr>
+					
 					<div class="row">
-						<div class= "col-lg-2">
-							<h3><i class="mdi mdi-account-search"></i> Buscar </h3>
+						<div class= "col-lg-12">
+							<h3 style="color:#6A2E98;" class="header-title m-t-0"> Busqueda un solo usuario</h3>
+							<h5 > <i class="mdi mdi-information-outline"></i> Ingrese en el buscador el nombre o el usuario de cualquier usuario registrado para ver toda su informacion y modificarlo.</h5>
 						</div>
-						<div class= "col-lg-9" style="padding-top: 15px;">
+					</div>
+					<div class="row">
+						<div class= "col-lg-12" style="padding-top: 15px;">
 							<select class="js-example-basic-single" name="state" style="width:100%">
 								<option value=""></option>
 								<?php
@@ -139,10 +156,30 @@ ob_end_clean();
 							</select>
 						</div>
 					</div>
+					<br>
+					<br>
+					<div id="tabla_div">
+						<div class="row">
+							<div class= "col-lg-12">
+								<h3 style="color:#6A2E98;" class="header-title m-t-0"> Todos los usuario registrados</h3>
+								<h5 > <i class="mdi mdi-information-outline"></i> Haga click en cualquier usuario para ver toda su informacion y modificarlo.</h5>
+							</div>
+
+						</div>
+						<div id="table_cont">
+							<table id="exampletable" class="table table-striped table-bordered dataTable no-footer dtr-inline" cellspacing="0" width="100%">
+						    	<?php
+						    		fill_datatable_usr_mod();
+						    	?>
+						    </table>
+						</div>
+					</div>
+
+
 					<div id="contain_form">
 						<form enctype="multipart/form-data" action="user_mod.php" id="usrmod_from" name="test" class="form-validation" novalidate="" method="post" style="display:none;">
-					
-							
+
+
 							<hr>
 							<div class="form-group">
 								<div class="col-lg-4">
@@ -151,7 +188,12 @@ ob_end_clean();
 								<div class="col-lg-5">
 									<input type="text" name="usr_id" parsley-trigger="change" required="" class="form-control" id="usr_id" readonly value="">
 								</div>
-							</h2>
+								<div class="col_lg-3">
+									<a href="user_mod.php"><button type="button" class="btn btn-danger btn-bordered btn-lg" style="width:25%">
+									<i class="ti-back-right"></i>Ver Todos los Usuarios
+									</button></a>
+								</div>
+							
 							<br>
 							<br>
 							<div class="form-group">
@@ -185,8 +227,19 @@ ob_end_clean();
 								</div>
 							</div>
 							<label>Fotografia</label>
-							<div class="thumb-xl member-thumb m-b-10 center-block">
-								<img src="usr_img\0.png" id="fotografia" class="img-circle img-thumbnail" alt="profile-image">
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="thumb-xl member-thumb m-b-10 center-block">
+										<h6 style="padding-left:10px;"> Imagen Actual </h6>
+										<img src="usr_img\0.png" id="fotografia" class="img-circle img-thumbnail" alt="FORMATO NO SOPORTADO, SELECCIONE NUEVA FOTO">
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="thumb-xl member-thumb m-b-10 center-block">
+										<h6 style="padding-left:10px;""> Vista Previa </h6>
+										<img src="usr_img\0.png" id="prev_foto" class="img-circle img-thumbnail" alt="FORMATO NO SOPORTADO, SELECCIONE NUEVA FOTO">
+									</div>
+								</div>
 							</div>
 							<br>
 							<div class="pull-right">
@@ -194,7 +247,7 @@ ob_end_clean();
 							</div>
 							<br>
 							<div class="form-group m-b-0">
-								<input type="file" class="filestyle" name="userfile" data-buttonname="btn-primary" id="filestyle-5"  tabindex="-1" style="position: absolute; clip: rect(0px 0px 0px 0px);">
+								<input type="file" class="filestyle" name="userfile" data-buttonname="btn-primary" id="filestyle-5"  tabindex="-1" style="position: absolute; clip: rect(0px 0px 0px 0px);" onchange="readURL(this);">
 								<div class="bootstrap-filestyle input-group"> 
 									<span class="group-span-filestyle input-group-btn" tabindex="0" id="summmer">
 
@@ -250,6 +303,9 @@ ob_end_clean();
 							</div>
 							<hr>
 							<div class="form-group text-right m-b-0">
+								<a href="user_mod.php"><button type="button" class="btn btn-danger btn-bordered btn-lg" style="width:25%">
+									<i class="mdi mdi-close"></i>Cancelar
+								</button></a>
 								<button class="btn btn-primary btn-bordered btn-lg" type="submit" style="width:35%" >
 									<i class="mdi mdi-check"></i>Guardar
 								</button>
@@ -320,25 +376,84 @@ ob_end_clean();
 	<!-- form advanced init js -->
 	<script src="assets/pages/jquery.form-advanced.init.js"></script>
 
+	<!-- Datatable js -->
+	<script src="assets/plugins/datatables/jquery.dataTables.min.js"></script>
+	<script src="assets/plugins/datatables/dataTables.bootstrap.js"></script>
+	<script src="assets/plugins/datatables/dataTables.buttons.min.js"></script>
+	<script src="assets/plugins/datatables/buttons.bootstrap.min.js"></script>
+	<script src="assets/plugins/datatables/jszip.min.js"></script>
+	<script src="assets/plugins/datatables/pdfmake.min.js"></script>
+	<script src="assets/plugins/datatables/vfs_fonts.js"></script>
+	<script src="assets/plugins/datatables/buttons.html5.min.js"></script>
+	<script src="assets/plugins/datatables/buttons.print.min.js"></script>
+	<script src="assets/plugins/datatables/dataTables.keyTable.min.js"></script>
+	<script src="assets/plugins/datatables/dataTables.responsive.min.js"></script>
+	<script src="assets/plugins/datatables/responsive.bootstrap.min.js"></script>
+	<script src="assets/plugins/datatables/dataTables.scroller.min.js"></script>
+	<script src="assets/plugins/datatables/dataTables.colVis.js"></script>
+	<script src="assets/plugins/datatables/dataTables.fixedColumns.min.js"></script>
+
+	<!-- init -->
+	<script src="assets/pages/jquery.datatables.init.js"></script>
 
 
 	<!-- App Js -->
 	<script src="assets/js/jquery.app.js"></script>
 
+	<script type="text/javascript">
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
 
+                reader.onload = function (e) {
+                    $('#prev_foto').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 	<script>
+
 			//Select 2 buscador de nombres y usuarios
 			var elem = ["usr_nombre","usr_app","usr_apm","datepicker-autoclose","usr_user", "usr_em", "usr_tel","usr_niv1","usr_ge2","summernote","fotografia" ]; //Elementos a modificar
 			$(document).ready(function() {
-				var select2 = $('.js-example-basic-single').select2({ placeholder: "Ingrese usuario o nombre del usuario para comenzar con la modificacion de un usuario " });
+				var select2 = $('.js-example-basic-single').select2({ placeholder: "Usuario o nombre completo" });
 			});
 			$('.js-example-basic-single').on('change', function() {
 				var $select = $(".js-example-basic-single").parent().find("select"); // it's <select> element
 				var value = $select.val(); 
+				document.getElementById("tabla_div").style.display = "none";
 				document.getElementById('usr_id').value= value;
+				$('html, body').animate({
+			        scrollTop: $("#contain_form").offset().top
+			    }, 500);
 				for($i=0;$i<elem.length;$i++)
 					getOutput(value, $i);
 			})
+
+			$(document).ready(function() {
+			    $('#exampletable').DataTable({
+			    	"searching": false,
+				    "drawCallback": function( settings ) {
+				        $("#exampletable").wrap( "<div class='table-responsive'></div>" );
+				    }
+				});
+			});
+
+
+
+
+			function callFromTable(value){
+				document.getElementById('usr_id').value= value;
+				document.getElementById("tabla_div").style.display = "none";
+				//document.getElementById('contain_form').scrollIntoView();
+			    $('html, body').animate({
+			        scrollTop: $("#contain_form").offset().top
+			    }, 500);
+				for($i=0;$i<elem.length;$i++)
+					getOutput(value, $i);
+			}
 
 
 			// handles the click event for link 1, sends the query
@@ -366,7 +481,6 @@ ob_end_clean();
 				
 				if(tipo==8 || tipo==7){
 					responseText=responseText.replace(/(\r\n|\n|\r)/gm,"");
-					console.log(responseText);
 					if(responseText=="1"){
 						elem_id="usr_niv1";
 						yesnoCheck();
