@@ -140,6 +140,7 @@ ob_end_clean();
 				}
 				?>
 				<div class="p-20 m-b-20">
+					<div id="error"></div>
 					<div class="row">
 						<div class= "col-lg-12">
 							<h3 style="color:#6A2E98;" class="header-title m-t-0"> Busqueda un solo producto</h3>
@@ -181,7 +182,7 @@ ob_end_clean();
 							<hr>
 							<div class="form-group">
 								<div class="col-lg-4">
-									<h4>Detalles del producto con el codigo</h4>
+									<h4>Detalles del producto a eliminar con el codigo</h4>
 								</div>
 								<div class="col-lg-5">
 									<input type="text" name="prod_cod" parsley-trigger="change" required="" class="form-control" id="prod_cod" readonly value="<?php err_print('prod_cod');?>">
@@ -562,5 +563,22 @@ ob_end_clean();
 		}
 		</script>
 
+		<?php
+			if(isset($_GET['id'])){
+				$exists=array_values(select("select codigo from producto where codigo='".$_GET['id']."'")[0])[0];
+				if($exists!="0"){
+					echo '<script type="text/javascript">',
+					     	'callFromTable(\''.$_GET['id'].'\');',
+					     '</script>'
+					;
+				}else{
+					echo('<script>
+					$.ajax({url: "lib/stock_lib.php?type=1"}).done(function( html ) {
+					    $("#error").append(html);
+					});
+					</script>');
+				}
+			}
+		?>
 	</body>
 	</html>

@@ -203,6 +203,7 @@ function page_print_leftsidemenu(){
 
 		<li><a href="stock.php"><span class="label label-custom pull-right"></span> <i class="mdi mdi-package-variant-closed"></i> Inventario </a></li>
 
+		<li><a href="stock_supply.php"><span class="label label-custom pull-right"></span> <i class="mdi mdi-package-variant-closed"></i> Surtir Producto </a></li>
 		
 		<li class="">
 			<a href="javascript: void(0);" aria-expanded="false"><i class="mdi mdi-package-variant-closed"></i> Gestion de Inventario <span class="fa arrow"></span></a>
@@ -258,7 +259,7 @@ function page_print_topnavbar(){
 
 		<!-- Top nav left menu -->
 		<ul class="nav navbar-nav hidden-sm hidden-xs top-navbar-items">
-		<li><a href="#">Acerca De</a></li>
+		<li><a href="about.php">Acerca De</a></li>
 		<li><a href="#">Ayuda</a></li>
 		<li><a href="contacts.php">Contacto</a></li>
 		</ul>

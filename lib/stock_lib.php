@@ -1,4 +1,11 @@
 <?php
+	if(isset($_GET['type'])){
+		include ("misc.php");
+		if($_GET['type']=="1"){
+			sweetalert('Producto no encontrado.</strong>',"bad");
+			echo("<br>");
+		}
+	}
 	function fill_types_clothes(){
 		$types = select("select id, nombre from tipo_producto");
 		
@@ -133,6 +140,50 @@
 	    echo('</tbody>');					    
 	}
 
+	function fill_datatable_prod_del_upd(){
+		echo('
+		 <thead>
+	        <tr>
+	            <th>Codigo</th>
+	            <th>Nombre</th>
+	          	<th>Tipo</th>
+	          	<th>Talla</th>
+	          	<th>Cantidad Stock</th>
+	          	<th>Precio</th>
+	          	<th>Actualizar</th>
+	          	<th>Eliminar</th>
+				<th>Surtir</th>
+	
+	        </tr>
+	    </thead>
+	    <tbody>
+	    ');
+
+		$table = select("select p.codigo, p.nombre as ne, tp.nombre, t.talla, p.cantidad_stock, p.precio from producto p inner join tipo_producto tp on tp.id = p.id_tipo inner join talla t on p.id_talla=t.id where activo=1");
+
+	
+	    for($i=0;$i<sizeof($table);$i++){
+	    	$pattern = '/\s*/m';
+   			$replace = '';
+    		$id=array_values($table[$i])[0];
+			$id=preg_replace( $pattern, $replace,$id );
+			echo('
+				<tr>
+					<td>'.array_values($table[$i])[0].'</td>
+					<td>'.array_values($table[$i])[1].'</td>
+					<td>'.array_values($table[$i])[2].'</td>
+					<td>'.array_values($table[$i])[3].'</td>
+					<td>'.array_values($table[$i])[4].'</td>
+					<td>'.array_values($table[$i])[5].'</td>
+					<td><center><button class="btn btn-icon btn-warning" onclick="open_del(\''.$id.'\')"> <i class="fa fa-wrench"></i> </button></center></td>
+					<td><center><button class="btn btn-icon btn-danger" onclick="open_mod(\''.$id.'\')"> <i class="fa fa-remove"></i> </button></center></td>
+					<td><center><button class="btn btn-icon btn-success" onclick="open_supp(\''.$id.'\')"> <i class="mdi mdi-plus-circle-outline"></i> </button></center></td>
+				</tr>
+				');
+		}
+	    echo('</tbody>');	
+	}
+
 	function update_prod($file, $tmp){
 
 		$users=select("select count(*) from producto where codigo='".$_POST["prod_cod"]."' and activo=1")[0];
@@ -208,5 +259,17 @@
 		sweetalert('Producto con el codigo['.$_POST["prod_cod"].'] eliminado correctamente.</strong>',"good");
 	}
 
+	function supply_product(){
+		$codigo=$_POST['prod_cod'];
+		$cant=$_POST['prod_cant_sup'];
+		$cant_actual=array_values(select("select cantidad_stock from producto where codigo='".$codigo."'")[0])[0];
+
+		$columns=["cantidad_stock"];
+		$values=[st($cant_actual+$cant)];
+		$table="producto";
+		$condition="where codigo='".$codigo."'";
+		update($columns,$values,$table,$condition);
+		sweetalert('Producto con el codigo['.$_POST["prod_cod"].'] surtido correctamente.</strong>',"good");
+	}
 
 ?>
