@@ -199,7 +199,7 @@ function page_print_leftsidemenu(){
 		
 		<li><a href="dashboard.php"><i class="ti-home"></i> Inicio </a></li>
 
-		<li><a href="venta.php"><span class="label label-custom pull-right"></span> <i class="mdi mdi-cart-outline"></i> Venta </a></li>
+		<li><a href="sale.php"><span class="label label-custom pull-right"></span> <i class="mdi mdi-cart-outline"></i> Venta </a></li>
 
 		<li><a href="stock.php"><span class="label label-custom pull-right"></span> <i class="mdi mdi-package-variant-closed"></i> Inventario </a></li>
 
@@ -214,9 +214,6 @@ function page_print_leftsidemenu(){
 			</ul>
 		</li>
 
-		<li><a href="javascript: void(0);" aria-expanded="true"><i class="mdi mdi-clipboard-outline"></i> Apartado de Productos</a></li>
-		
-		<li><a href="javascript: void(0);" aria-expanded="true"><i class="mdi mdi-account-outline"></i> Gestion de Clientes</a></li>
 		
 		<li class="">
 		<a href="javascript: void(0);" aria-expanded="false"><i class="mdi mdi-lock-outline"></i> Gestion de Usuarios <span class="fa arrow"></span></a>
@@ -301,7 +298,7 @@ function get_name_cashier(){
 
 function get_date(){
 	$dateTime = new DateTime('now'); 
-	echo('<h6>'.
+	echo('<h6 id="fecha">'.
 		$dateTime->format("l, d F Y    h:i A")
 		.'</h6>');
 }

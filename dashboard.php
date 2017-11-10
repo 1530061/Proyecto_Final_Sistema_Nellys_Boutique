@@ -2,6 +2,7 @@
   session_start();
   include ("lib/db.php");
   include ("lib/misc.php");
+  include ("lib/dashboard_lib.php");
 
   if (empty($_SESSION["logg"]))
     header('Location: /final/index.php');
@@ -25,6 +26,9 @@
         <link href="assets/css/bootstrap.min.css" rel="stylesheet">
         <!-- MetisMenu CSS -->
         <link href="assets/css/metisMenu.min.css" rel="stylesheet">
+                <!--Morris Chart CSS -->
+    <link rel="stylesheet" href="assets/plugins/morris/morris.css">
+
         <!-- Icons CSS -->
         <link href="assets/css/icons.css" rel="stylesheet">
         <!-- Custom styles for this template -->
@@ -39,6 +43,11 @@
         <link href="assets/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
         <link href="assets/plugins/clockpicker/css/bootstrap-clockpicker.min.css" rel="stylesheet">
         <link href="assets/plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+
+
+        <!-- Icons CSS -->
+        <link href="assets/css/icons.css" rel="stylesheet">
+
 
     </head>
 
@@ -99,7 +108,64 @@
                       <?php
                         motd();
                       ?>
+                    </div>
                   </div>
+                  <div class="card-box widget-inline">
+                    <div class="row">
+                      <div class="col-lg-3 col-sm-6">
+                        <div class="widget-inline-box text-center">
+                          <h3 class="m-t-10"><i class="text-primary mdi mdi-access-point-network"></i> <b data-plugin="counterup">
+                            <?php 
+                              getRegistredUsers();
+                            ?></b>
+                          </h3>
+                          <p class="text-muted">Usuarios Registrados</p>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-3 col-sm-6">
+                        <div class="widget-inline-box text-center">
+                          <h3 class="m-t-10"><i class="text-custom mdi mdi-airplay"></i> <b data-plugin="counterup">
+                            <?php
+                            getRegistredProducts();
+                            ?></b></h3>
+                          <p class="text-muted">Productos Registrados</p>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-3 col-sm-6">
+                        <div class="widget-inline-box text-center">
+                          <h3 class="m-t-10"><i class="text-info mdi mdi-black-mesa"></i> <b data-plugin="counterup"><?php
+                            getTopProduct();
+                          ?></b></h3>
+                          <p class="text-muted">Producto mas vendido</p>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-3 col-sm-6">
+                        <div class="widget-inline-box text-center b-0">
+                          <h3 class="m-t-10"><i class="text-danger mdi mdi-cellphone-link"></i> <b data-plugin="counterup"><?php
+                            getDailySales();
+                          ?></b></h3>
+                          <p class="text-muted">Ventas del dia</p>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                  <div id="grafica_cantidad_top_productos" style="height: 250px;"></div>
+                  <div class="row">
+                     <div class="col-lg-3 col-sm-3">
+                          <div id="otro" style="height: 250px;"></div>
+                     </div>
+                      <div class="col-lg-3 col-sm-3">
+                          <div id="usuarios_y_administradores" style="height: 250px;"></div>
+                      </div>
+                      <div class="col-lg-6 col-sm-6">
+                          <div id="productos_mas_caros" style="height: 250px;"></div>
+                      </div>
+                  </div>
+                  <div id="tipos_producto" style="height: 250px;"></div>
                   
                        
                   <!-- end container -->
@@ -142,6 +208,96 @@
 
         <!-- fun-->
         <script src="lib/fun.js"></script>
+
+        <script>
+          new Morris.Line({
+          // ID of the element in which to draw the chart.
+          element: 'grafica_cantidad_top_productos',
+          // Chart data records -- each entry in this array corresponds to a point on
+          // the chart.
+          data: [
+            { year: '2008', value: 20 },
+            { year: '2009', value: 10 },
+            { year: '2010', value: 5 },
+            { year: '2011', value: 5 },
+            { year: '2012', value: 20 }
+          ],
+          // The name of the data record attribute that contains x-values.
+          xkey: 'year',
+          // A list of names of data record attributes that contain y-values.
+          ykeys: ['value'],
+          // Labels for the ykeys -- will be displayed when you hover over the
+          // chart.
+          labels: ['Value']
+          });
+
+          new Morris.Bar({
+          // ID of the element in which to draw the chart.
+          element: 'tipos_producto',
+          // Chart data records -- each entry in this array corresponds to a point on
+          // the chart.
+          data: [
+            <?php
+              getTypes();
+            ?>
+
+          ],
+          // The name of the data record attribute that contains x-values.
+          xkey: 'mapname',
+          // A list of names of data record attributes that contain y-values.
+          ykeys: ['value'],
+          // Labels for the ykeys -- will be displayed when you hover over the
+          // chart.
+          labels: ['Value']
+          });
+
+           Morris.Donut({
+            element: 'otro',
+            data: [
+            <?php
+                getUserAdminChart();
+
+              ?>
+            ]
+          });
+
+               Morris.Donut({
+            element: 'usuarios_y_administradores',
+            data: [
+            <?php
+                getUserAdminChart();
+
+              ?>
+            ]
+          });
+
+
+          
+          new Morris.Bar({
+          // ID of the element in which to draw the chart.
+          element: 'productos_mas_caros',
+          // Chart data records -- each entry in this array corresponds to a point on
+          // the chart.
+          data: [
+          
+                    <?php
+              getMostExpensive();
+            ?>
+   
+          ],
+          // The name of the data record attribute that contains x-values.
+          xkey: 'mapname',
+          // A list of names of data record attributes that contain y-values.
+          ykeys: ['value'],
+          // Labels for the ykeys -- will be displayed when you hover over the
+          // chart.
+          labels: ['Value']
+          });
+
+
+
+
+        </script>
 
     </body>
 </html>
