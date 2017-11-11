@@ -1,9 +1,10 @@
 <?php 
   session_start();
-  include ("lib/db.php");
-  include ("lib/misc.php");
-  include ("lib/contacts_lib.php");
+  include ("lib/db.php");               //Funciones encargadas de la BD
+  include ("lib/misc.php");             //Funciones compartidas en todos los formularios
 
+
+  //Se revisa que la conexion tenga una sesion activa sino se redirige al index.php
   if (empty($_SESSION["logg"]))
     header('Location: /final/index.php');
 ?>
@@ -11,7 +12,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>SimpleAdmin - Responsive Admin Dashboard Template</title>
+        <title>Ayuda</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
         <meta content="Coderthemes" name="author" />
@@ -30,6 +31,7 @@
         <link href="assets/css/icons.css" rel="stylesheet">
         <!-- Custom styles for this template -->
         <link href="assets/css/style.css" rel="stylesheet">
+
 
     </head>
 
@@ -72,14 +74,11 @@
                 <!-- START PAGE CONTENT -->
                 <div id="page-right-content">
                   <!-- Logo and name -->
-                  <div class="row">
-                    <div class="col-sm-1 col-md-4 col-lg-1">
-                      <span class="ti-home gi-5x" style="font-size: 60px; padding-left: 10px;" ></span> 
-                    </div>
-                    <div class="col-sm-11 col-md-8 col-lg-11">
-                      <h1> Ayuda </h1>
-                    </div>
-                  </div>
+                 
+
+                  <div class="col-sm-12 col-md-12 col-lg-12">
+                    <h1 style="color:#D52B2B;"><span class="mdi mdi-help-circle gi-5x" style="font-size: 60px; padding-left: 10px;" ></span>  Ayuda</h1>
+                </div>
 
                  
                   
@@ -104,22 +103,7 @@
             <!-- end .page-contentbar -->
         </div>
         <!-- End #page-wrapper -->
-        <script>
-          function initMap(){
-			var location ={lat: 23.749351, lng:-99.137609};
-			var map = new google.maps.Map(document.getElementById("map"),{
-				zoom:18,
-				center: location
-			});
-			var marker = new google.maps.Marker({
-				position:location,
-				map:map
-			});
-          }
-
-        </script>
-
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQhWEnofX1eNC2rK2yXn_c8pRVsac39rg&callback=initMap"></script>
+ 
 
         <!-- js placed at the end of the document so the pages load faster -->
         <script src="assets/js/jquery-2.1.4.min.js"></script>
@@ -127,21 +111,15 @@
         <script src="assets/js/metisMenu.min.js"></script>
         <script src="assets/js/jquery.slimscroll.min.js"></script>
 
-        <!--Morris Chart-->
-		    <script src="assets/plugins/morris/morris.min.js"></script>
-		    <script src="assets/plugins/raphael/raphael-min.js"></script>
 
         <!-- SweetAlert-->
         <script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
         <script src="assets/pages/jquery.sweet-alert.init.js"></script>
 
-        <!-- Dashboard init -->
-		    <script src="assets/pages/jquery.dashboard.js"></script>
-
         <!-- App Js -->
         <script src="assets/js/jquery.app.js"></script>
 
-        <!-- fun-->
+        <!-- Logout-->
         <script src="lib/fun.js"></script>
 
     </body>

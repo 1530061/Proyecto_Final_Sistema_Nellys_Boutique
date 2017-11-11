@@ -1,15 +1,80 @@
 <?php 
 session_start();
-include ("lib/db.php");
-include ("lib/misc.php");
-include ("lib/stock_lib.php");
+include ("lib/db.php");               //Funciones encargada de la BD
+include ("lib/misc.php");             //Funciones compartidas en todos los formularios
+include ("lib/stock_lib.php");		  //Funciones llenado de tablas busqueda
+
+//Funcion que se encarga de hacer la insercion de un producto
+function insert_product($file, $tmp){
+	$prod_cod=select("select codigo from producto where codigo='".$_POST["prod_cod"]."' and activo=1")[0];
+	if(array_values($prod_cod)[0]=="0" && $_POST["prod_cod"]!='0'){
+
+	
+	$values=[st($_POST["prod_cod"]),st($_POST["prod_name"]),st($_POST["prod_desc"]), st($_POST["prod_tipo"]), st($_POST["prod_talla"]),$_POST["prod_precio"], st($_POST["prod_cant"]),"1"];
+	$columns=["codigo", "nombre", "descripcion", "id_tipo", "id_talla", "precio", "cantidad_stock","activo"];
+
+	if(!empty($_FILES['userfile']['name'])){
+		$errors     = array();
+		    $maxsize    = 2097152;		//2MB
+		    $acceptable = array(		//Tipos
+		    	'image/jpe',
+		    	'image/jpeg',
+		    	'image/jpg',
+		    	'image/gif',
+		    	'image/png'
+		    );
+
+		    if(($_FILES['userfile']['size'] >= $maxsize) || ($_FILES["userfile"]["size"] == 0)) {
+		    	$errors[] = 'Archivo muy grande. El archivo debe de ser mas pequeño que 2MB.';
+		    }
+		    if(!in_array($_FILES['userfile']['type'], $acceptable) && (!empty($_FILES["userfile"]["type"]))) {
+		    	$errors[] = 'Formato de fotografia invalido, solo formatos JPG, JPEG, PNG, JPE y GIF aceptados.';
+		    }
+
+		    if(count($errors) === 0) {
+		    	insert($columns, $values, "producto");
+		    	include 'upload_picture.php';
+		    	$fileloc=upload_product($file, $tmp, $_POST["prod_cod"]);
+
+		    	$columns=["fotografia"];
+		    	$values=[st($fileloc)];
+		    	$table="producto";
+		    	$condition="where codigo='".$_POST["prod_cod"]."'";
+		    	update($columns,$values,$table,$condition);
+		    	sweetalert('Producto ['.$_POST["prod_cod"].'] agregado correctamente.</strong>',"good");
+		    	$_POST = array();
+		    } else {    
+		    	
+		    	foreach($errors as $error) {
+		    		sweetalert($error,"bad");
+		    		
+		    	}
+		    }
+		}else{
+			$fileloc='prod_img\\\\0.png';
+			insert($columns, $values, "producto");
+			
+			$columns=["fotografia"];
+			$values=[st($fileloc)];
+			$table="producto";
+			$condition="where codigo='".$_POST["prod_cod"]."'";
+			
+			update($columns,$values,$table,$condition);
+			sweetalert('Producto ['.$_POST["prod_cod"].'] agregado correctamente.</strong>',"good");
+			$_POST = array();
+		}
+	}else{
+		sweetalert("El producto con el codigo [".$_POST["prod_cod"]."] no esta disponible, Intente nuevamente.","bad");
+	}
+}
+
 
 if (empty($_SESSION["logg"]))
 	header('Location: /final/index.php');
 ?>
 
 
-<?php // here start your php file
+<?php 
 ob_get_contents();
 ob_end_clean();
 ?>
@@ -18,7 +83,7 @@ ob_end_clean();
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>Agregar Usuario</title>
+	<title>Agregar Producto</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
 	<meta content="Coderthemes" name="author" />
@@ -92,44 +157,43 @@ ob_end_clean();
 			<!-- START PAGE CONTENT -->
 			<div id="page-right-content">
 				<!-- Logo and name -->
-				<div class="row" style="height:70px;">
-					<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-						<span class="mdi mdi-package-variant" style="font-size: 60px; padding-left: 10px;" ></span> 
-					</div>
-					<div class="col-sm-11 col-md-8 col-lg-11">
-						<h1 style="color:#D52B2B;"> Agregar Producto </h1>
-					</div>
-					<hr>
+				<div class="col-sm-12 col-md-12 col-lg-12">
+					<h1 style="color:#D52B2B;"><span class="mdi mdi-package-variant" style="font-size: 60px; padding-left: 10px;" ></span>  Agregar Producto </h1>
+					<?php
+						if($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) &&
+							empty($_FILES) && $_SERVER['CONTENT_LENGTH'] > 0)
+						{
+							echo('<div class="alert alert-danger alert-dismissible fade in" role="alert">
+								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+								<span aria-hidden="true">×</span>
+								</button>
+								<strong> La imagen excede el tamaño permitido (>8MB)
+								</div>');
+						}
+						if(isset($_POST["prod_cod"])){
+
+							$file=$_FILES['userfile']['name'];
+							$tmp=$_FILES['userfile']['tmp_name'];
+
+							insert_product($file, $tmp);
+						}
+					?>
+					<br>
 				</div>
-				
 
 				
-				<?php
-				if($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) &&
-					empty($_FILES) && $_SERVER['CONTENT_LENGTH'] > 0)
-				{
-					echo('<div class="alert alert-danger alert-dismissible fade in" role="alert">
-						<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-						<span aria-hidden="true">×</span>
-						</button>
-						<strong> La imagen excede el tamaño permitido (>8MB)
-						</div>');
-				}
-				if(isset($_POST["prod_cod"])){
-
-					$file=$_FILES['userfile']['name'];
-					$tmp=$_FILES['userfile']['tmp_name'];
-
-					insert_product($file, $tmp);
-				}
-				?>
 				<div class="p-20 m-b-20">
+
 					<form enctype="multipart/form-data" action="stock_new.php" id="testx" name="test" class="form-validation" novalidate="" method="post">
+	
+					
 
 						<div class="form-group">
 							<label for="prod_cod">Codigo<span class="text-danger">*</span></label>
 							<input type="text" name="prod_cod" parsley-trigger="change" required="" class="form-control" id="prod_cod" value="<?php err_print('prod_cod');?>">
 						</div>
+
+
 						<div class="form-group">
 							<label for="prod_name">Nombre<span class="text-danger">*</span></label>
 							<input type="text" name="prod_name" parsley-trigger="change" required="" class="form-control" id="prod_name" value="<?php err_print('prod_name');?>">
@@ -156,6 +220,7 @@ ob_end_clean();
 							</select>
 							
 						</div>
+
 						<div class="form-group">
 							<label for="prod_precio">Precio <span class="text-danger">*</span></label>
 							<input type="number" name="prod_precio" class="form-control" min="1" id="prod_precio" style="text-align: left;  padding-right: 10px;" value=1>
@@ -217,16 +282,6 @@ ob_end_clean();
 	<script src="assets/js/metisMenu.min.js"></script>
 	<script src="assets/js/jquery.slimscroll.min.js"></script>
 
-	<!--Morris Chart-->
-	<script src="assets/plugins/morris/morris.min.js"></script>
-	<script src="assets/plugins/raphael/raphael-min.js"></script>
-
-	<!-- SweetAlert-->
-	<script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
-	<script src="assets/pages/jquery.sweet-alert.init.js"></script>
-
-	<!-- Dashboard init -->
-	<script src="assets/pages/jquery.dashboard.js"></script>
 
 	<!-- App Js -->
 	<script src="assets/js/jquery.app.js"></script>
@@ -282,76 +337,45 @@ ob_end_clean();
 			getOutput(id);
 		    
 		}
-		function yesnoCheck(that) {
-			document.getElementById("emg").style.display = "none";
-			document.getElementById("telf").style.display = "none";
-			document.getElementById("summer").style.display = "none";
-		}
-		function yesnoCheck2(that) {
-			document.getElementById("emg").style.display = "block" 
-			document.getElementById("telf").style.display = "block";
-			document.getElementById("summer").style.display = "block";
-		}
 	</script>
 	
 	<script type="text/javascript">
-		$(document).ready(function() {
-			$('.form-validation').parsley();
-			$('.summernote').summernote({
-                    height: 350,                 // set editor height
-                    minHeight: null,             // set minimum height of editor
-                    maxHeight: null,             // set maximum height of editor
-                    focus: false                 // set focus to editable area after initializing summernote
-                });
-		});
-		$(document).ready(function() {
-			$('#summernote').summernote({
-				height: "170px"
-			});
-		});
-	
 		function getOutput(id) {
 			getRequest(
-		      'lib/searchsize.php?id_tipo='+id, // URL for the PHP file
-		       drawOutput,  // handle successful request
+		      'lib/searchsize.php?id_tipo='+id, 
+		       drawOutput,  
 		       drawError,
-		       id  // handle error
+		       id  
 		       );
 			return false;
 		}  
 
-		// handles drawing an error message
+		//Muestra error en la solicitud Error
 		function drawError() {
 			var container = document.getElementById('output');
 			container.innerHTML = 'Bummer: there was an error!';
 		}
 		
+		//Funcion que manda al elemento superior de la pantalla
 		function gotop(){
 		    $('html, body').animate({
 		        scrollTop: $("#page-right-content").offset().top
 		    }, 500);
 		}
-		// handles the response, adds the html
+		//Respuesta
 		function drawOutput(responseText, id) {
-			console.log(responseText);
-			//RADIOBUTTON GENER			
+			console.log(responseText);		
 			$("#prod_talla").html(responseText);
-			//var list = document.getElementById(prod_talla);
-			//list.innerHTML= responseText;
-			
 		}
-		// helper function for cross-browser request object
+		//Manejador de solicitud
 		function getRequest(url, success, error, tipo) {
 			var req = false;
 			try{
-		        // most browsers
 		        req = new XMLHttpRequest();
 		    } catch (e){
-		        // IE
 		        try{
 		        	req = new ActiveXObject("Msxml2.XMLHTTP");
 		        } catch(e) {
-		            // try an older version
 		            try{
 		            	req = new ActiveXObject("Microsoft.XMLHTTP");
 		            } catch(e) {

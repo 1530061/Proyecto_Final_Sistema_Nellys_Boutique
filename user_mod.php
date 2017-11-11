@@ -1,15 +1,15 @@
 	<?php 
 	session_start();
-	include ("lib/db.php");
-	include ("lib/misc.php");
-	include ("lib/user_control_lib.php");
+	include ("lib/db.php");               //Funciones encargada de la BD
+	include ("lib/misc.php");             //Funciones compartidas en todos los formularios
+	include ("lib/user_control_lib.php"); //Funciones compartidas entre la seccion de control de usuarios
 
 	if (empty($_SESSION["logg"]))
 		header('Location: /final/index.php');
 	?>
 
 
-	<?php // here start your php file
+	<?php 
 	ob_get_contents();
 	ob_end_clean();
 	?>
@@ -104,40 +104,29 @@
 				<!-- START PAGE CONTENT -->
 				<div id="page-right-content">
 					<!-- Logo and name -->
-					<div class="row" style="height:70px;">
-						<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-							<span class="mdi mdi-account-star-variant" style="font-size: 60px; padding-left: 10px;" ></span> 
-						</div>
-						<div class="col-sm-11 col-md-8 col-lg-11">
-							<h1 style="color:#D52B2B;"> Modificar Usuario </h1>
-						</div>
-						<hr>
+					<div class="col-sm-12 col-md-12 col-lg-12">
+						<h1 style="color:#D52B2B;"><span class="mdi mdi-account-star-variant" style="font-size: 60px; padding-left: 10px;" ></span>    Modificar Usuario </h1>
+					
+						<?php
+							if($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) &&
+								empty($_FILES) && $_SERVER['CONTENT_LENGTH'] > 0)
+							{
+								echo('<div class="alert alert-danger alert-dismissible fade in" role="alert">
+									<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+									<span aria-hidden="true">×</span>
+									</button>
+									<strong> La imagen excede el tamaño permitido (>8MB)
+									</div>');
+							}
+							if(isset($_POST["usr_nombre"])){
+								
+								$file=$_FILES['userfile']['name'];
+								$tmp=$_FILES['userfile']['tmp_name'];
+
+								update_user($file, $tmp);
+							}
+						?>
 					</div>
-
-
-
-
-					<?php
-					if($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) &&
-						empty($_FILES) && $_SERVER['CONTENT_LENGTH'] > 0)
-					{
-						echo('<div class="alert alert-danger alert-dismissible fade in" role="alert">
-							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-							<span aria-hidden="true">×</span>
-							</button>
-							<strong> La imagen excede el tamaño permitido (>8MB)
-							</div>');
-					}
-					if(isset($_POST["usr_nombre"])){
-						
-						$file=$_FILES['userfile']['name'];
-						$tmp=$_FILES['userfile']['tmp_name'];
-
-						update_user($file, $tmp);
-						//$values=[$_POST["name"],$_POST["usr"],$_POST["p"];
-						
-					}
-					?>
 					<div class="p-20 m-b-20">
 						
 						<div class="row">
@@ -189,7 +178,7 @@
 										<input type="text" name="usr_id" parsley-trigger="change" required="" class="form-control" id="usr_id" readonly value="">
 									</div>
 									<div class="col_lg-3">
-										<a href="user_mod.php"><button type="button" class="btn btn-danger btn-bordered btn-lg" style="width:25%">
+										<a href="user_mod.php"><button type="button" class="btn btn-danger btn-bordered btn-lg" style="width:220px">
 											<i class="ti-back-right"></i>Ver Todos los Usuarios
 										</button></a>
 									</div>
@@ -340,16 +329,10 @@
 			<script src="assets/js/metisMenu.min.js"></script>
 			<script src="assets/js/jquery.slimscroll.min.js"></script>
 
-			<!--Morris Chart-->
-			<script src="assets/plugins/morris/morris.min.js"></script>
-			<script src="assets/plugins/raphael/raphael-min.js"></script>
 
 			<!-- SweetAlert-->
 			<script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
 			<script src="assets/pages/jquery.sweet-alert.init.js"></script>
-
-			<!-- Dashboard init -->
-			<script src="assets/pages/jquery.dashboard.js"></script>
 
 			<!-- App Js -->
 			<script src="assets/js/jquery.app.js"></script>
@@ -422,6 +405,7 @@
 				$(document).ready(function() {
 					var select2 = $('.js-example-basic-single').select2({ placeholder: "Usuario o nombre completo" });
 				});
+				//Select 2
 				$('.js-example-basic-single').on('change', function() {
 					var $select = $(".js-example-basic-single").parent().find("select"); // it's <select> element
 					var value = $select.val(); 
@@ -434,6 +418,7 @@
 						getOutput(value, $i);
 				})
 
+				//Creacion de tabla
 				$(document).ready(function() {
 					$('#exampletable').DataTable({
 						"searching": false,
@@ -444,12 +429,10 @@
 				});
 
 
-
-
+				//Evento de llamado por celda
 				function callFromTable(value){
 					document.getElementById('usr_id').value= value;
 					document.getElementById("tabla_div").style.display = "none";
-					//document.getElementById('contain_form').scrollIntoView();
 					$('html, body').animate({
 						scrollTop: $("#contain_form").offset().top
 					}, 500);
@@ -458,7 +441,7 @@
 				}
 
 
-				// handles the click event for link 1, sends the query
+				// Salida
 				function getOutput(id,tipo) {
 					getRequest(
 				      'lib/searchbyid.php?id='+id+'&t='+tipo, // URL for the PHP file
@@ -469,18 +452,16 @@
 					return false;
 				}  
 
-				// handles drawing an error message
+				// Error
 				function drawError() {
 					var container = document.getElementById('output');
 					container.innerHTML = 'Bummer: there was an error!';
 				}
 				
 				
-				// handles the response, adds the html
+				// Salida
 				function drawOutput(responseText, tipo) {
-					//RADIOBUTTON GENERO
-					elem_id=elem[tipo];
-					
+					elem_id=elem[tipo];				
 					if(tipo==8 || tipo==7){
 						responseText=responseText.replace(/(\r\n|\n|\r)/gm,"");
 						if(responseText=="1"){
@@ -505,18 +486,15 @@
 							document.getElementById(elem_id).value= responseText;
 					}
 				}
-				// helper function for cross-browser request object
+				// Salida
 				function getRequest(url, success, error, tipo) {
 					var req = false;
 					try{
-				        // most browsers
 				        req = new XMLHttpRequest();
 				    } catch (e){
-				        // IE
 				        try{
 				        	req = new ActiveXObject("Msxml2.XMLHTTP");
 				        } catch(e) {
-				            // try an older version
 				            try{
 				            	req = new ActiveXObject("Microsoft.XMLHTTP");
 				            } catch(e) {
@@ -539,6 +517,7 @@
 				    return req;
 				}
 
+				//Radiobuttons administrador
 				function yesnoCheck(that) {
 					document.getElementById("emg").style.display = "none";
 					document.getElementById("telf").style.display = "none";
@@ -552,6 +531,7 @@
 			</script>
 
 			<script type="text/javascript">
+				//Summernote
 				$(document).ready(function() {
 					$('.form-validation').parsley();
 					$('.summernote').summernote({

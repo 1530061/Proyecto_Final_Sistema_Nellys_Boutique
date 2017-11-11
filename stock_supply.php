@@ -1,15 +1,28 @@
 	<?php 
 	session_start();
-	include ("lib/db.php");
-	include ("lib/misc.php");
-	include ("lib/stock_lib.php");
+	include ("lib/db.php");               //Funciones encargada de la BD
+	include ("lib/misc.php");             //Funciones compartidas en todos los formularios
+	include ("lib/stock_lib.php");		  //Funciones llenado de tablas busqueda
+
+	//Funcion que permite surtir un producto
+	function supply_product(){
+		$codigo=$_POST['prod_cod'];
+		$cant=$_POST['prod_cant_sup'];
+		$cant_actual=array_values(select("select cantidad_stock from producto where codigo='".$codigo."'")[0])[0];
+
+		$columns=["cantidad_stock"];
+		$values=[st($cant_actual+$cant)];
+		$table="producto";
+		$condition="where codigo='".$codigo."'";
+		update($columns,$values,$table,$condition);
+		sweetalert('Producto con el codigo['.$_POST["prod_cod"].'] surtido correctamente.</strong>',"good");
+	}
 
 	if (empty($_SESSION["logg"]))
 		header('Location: /final/index.php');
 	?>
 
-
-	<?php // here start your php file
+	<?php 
 	ob_get_contents();
 	ob_end_clean();
 	?>
@@ -18,7 +31,7 @@
 	<html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<title>Eliminar Usuario</title>
+		<title>Surtir Producto</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
 		<meta content="Coderthemes" name="author" />
@@ -105,25 +118,16 @@
 				<!-- START PAGE CONTENT -->
 				<div id="page-right-content">
 					<!-- Logo and name -->
-					<div class="row" style="height:70px;">
-						<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-							<span class="mdi mdi-autorenew" style="font-size: 60px; padding-left: 10px;" ></span> 
-						</div>
-						<div class="col-sm-11 col-md-8 col-lg-11">
-							<h1 style="color:#D52B2B;"> Modificar Producto </h1>
-						</div>
 
+					<div class="col-sm-12 col-md-12 col-lg-12">
+						<h1 style="color:#D52B2B;"><span class="mdi mdi-library-plus" style="font-size: 60px; padding-left: 10px;" ></span>  Surtir Producto </h1>
+						<?php
+						if(isset($_POST["prod_cod"]) && isset($_POST["prod_cant_sup"])){
+							supply_product();
+						}
+						?>
 					</div>
-
-
-
-					<?php
-
-
-					if(isset($_POST["prod_cod"]) && isset($_POST["prod_cant_sup"])){
-						supply_product();
-					}
-					?>
+					
 
 					<div class="p-20 m-b-20">
 						<div id="error">
@@ -227,16 +231,10 @@
 		<script src="assets/js/metisMenu.min.js"></script>
 		<script src="assets/js/jquery.slimscroll.min.js"></script>
 
-		<!--Morris Chart-->
-		<script src="assets/plugins/morris/morris.min.js"></script>
-		<script src="assets/plugins/raphael/raphael-min.js"></script>
-
 		<!-- SweetAlert-->
 		<script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
 		<script src="assets/pages/jquery.sweet-alert.init.js"></script>
 
-		<!-- Dashboard init -->
-		<script src="assets/pages/jquery.dashboard.js"></script>
 
 		<!-- App Js -->
 		<script src="assets/js/jquery.app.js"></script>
@@ -296,14 +294,12 @@
 
 
 				//Select 2 buscador de nombres y usuarios
-				 //Elementos a modificar
 				$(document).ready(function() {
 					var select2 = $('.js-example-basic-single').select2({ placeholder: "Codigo o Nombre del Producto " });
 				});
 				$('.js-example-basic-single').on('change', function() {
-					var $select = $(".js-example-basic-single").parent().find("select"); // it's <select> element
+					var $select = $(".js-example-basic-single").parent().find("select"); 
 					var value = $select.val(); 
-					//document.getElementById("tabla_div").style.display = "none";
 					document.getElementById('prod_cod').value= value;
 					$('html, body').animate({
 				        scrollTop: $("#contain_form").offset().top
@@ -324,8 +320,6 @@
 				var elem = ["prod_name","prod_desc","prod_tip","prod_tall","prod_precio", "prod_cant", "fotografia"];
 				function callFromTable(value){
 					document.getElementById('prod_cod').value= value;
-					//document.getElementById("tabla_div").style.display = "none";
-					//document.getElementById('contain_form').scrollIntoView();
 				    $('html, body').animate({
 				        scrollTop: $("#contain_form").offset().top
 				    }, 500);
@@ -334,15 +328,12 @@
 					}
 				}
 
-							// handles drawing an error message
-
-				// handles the click event for link 1, sends the query
 				function getOutput(id,tipo) {
 					getRequest(
-				      'lib/searchbycode_products.php?id="'+id+'"&t='+tipo, // URL for the PHP file
-				       drawOutput,  // handle successful request
+				      'lib/searchbycode_products.php?id="'+id+'"&t='+tipo, 
+				       drawOutput,  
 				       drawError,
-				       tipo  // handle error
+				       tipo  
 				       );
 					return false;
 				}  
@@ -356,9 +347,7 @@
 				var responsePrevTipo;
 				// handles the response, adds the html
 				function drawOutput(responseText, tipo) {
-					//RADIOBUTTON GENERO
 					elem_id=elem[tipo];
-					//alert(responseText)
 					if(tipo!=1 && tipo!=4){
 						if(tipo==6){
 							document.getElementById(elem_id).src= responseText;
@@ -376,18 +365,14 @@
 						}
 					}
 				}
-				// helper function for cross-browser request object
 				function getRequest(url, success, error, tipo) {
 					var req = false;
 					try{
-				        // most browsers
 				        req = new XMLHttpRequest();
 				    } catch (e){
-				        // IE
 				        try{
 				        	req = new ActiveXObject("Msxml2.XMLHTTP");
 				        } catch(e) {
-				            // try an older version
 				            try{
 				            	req = new ActiveXObject("Microsoft.XMLHTTP");
 				            } catch(e) {
@@ -409,74 +394,45 @@
 				    document.getElementById("prodmod_from").style.display="block";
 				    return req;
 				}
-
-				function yesnoCheck(that) {
-					document.getElementById("emg").style.display = "none";
-					document.getElementById("telf").style.display = "none";
-					document.getElementById("sum").style.display = "none";
-				}
-				function yesnoCheck2(that) {
-					document.getElementById("emg").style.display = "block" 
-					document.getElementById("telf").style.display = "block";
-					document.getElementById("sum").style.display = "block";
-				}
 			</script>
 
 			<script type="text/javascript">
-				$(document).ready(function() {
-					$('.form-validation').parsley();
-					$('.summernote').summernote({
-						height: 350,                 
-						minHeight: null,            
-						maxHeight: null,             
-						focus: false                 
-					});
-				});
-				$(document).ready(function() {
-					$('#summernote').summernote({
-						height: "170px"
-					});
-				});
 				var postForm = function() {
 					var content = $('textarea[name="content"]').html($('#summernote').code());
 				}
 
-
 			function getOutput2(id,talla) {
 				getRequest2(
-			      'lib/searchsize.php?id_tipo='+id+'&talla='+talla+'&n=0', // URL for the PHP file
-			       drawOutput2,  // handle successful request
+			      'lib/searchsize.php?id_tipo='+id+'&talla='+talla+'&n=0',
+			       drawOutput2,  
 			       drawError,
-			       id  // handle error
+			       id  
 			       );
 				return false;
 			}  
 
-			// handles drawing an error message
+			//Respuesta
 			function updateSize(event) {
 				id=this.options[this.selectedIndex].value;
 				getOutput2(id);
 			    
 			}
 
-			// handles the response, adds the html
+			// Respuesta
 			function drawOutput2(responseText) {
 				$("#prod_talla").html(responseText);
 
 				
 			}
-			// helper function for cross-browser request object
+			// Respuesta
 			function getRequest2(url, success, error, tipo) {
 				var req = false;
 				try{
-			        // most browsers
 			        req = new XMLHttpRequest();
 			    } catch (e){
-			        // IE
 			        try{
 			        	req = new ActiveXObject("Msxml2.XMLHTTP");
 			        } catch(e) {
-			            // try an older version
 			            try{
 			            	req = new ActiveXObject("Microsoft.XMLHTTP");
 			            } catch(e) {
@@ -497,6 +453,7 @@
 			    req.send(null);
 			    return req;
 			}
+			//Funcion que permite hacer una animacion hacia arriba
 			function animateToTop(){
 			    $('html, body').animate({
 			        scrollTop: $("#contain_form").offset().top
@@ -506,15 +463,14 @@
 
 
 			<?php
+				//Muestra error y hace el evento de buscar
 				if(isset($_GET['id'])){
 					$exists=array_values(select("select codigo from producto where codigo='".$_GET['id']."'")[0])[0];
 					if($exists!="0"){
 						echo '<script type="text/javascript">',
 						     	'callFromTable(\''.$_GET['id'].'\');',
 						     	'animateToTop();',
-						     '</script>'
-	     				   				   
-     				    	
+						     '</script>'			    	
 						;
 					}else{
 						echo('<script>

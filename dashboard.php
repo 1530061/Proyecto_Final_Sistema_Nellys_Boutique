@@ -1,9 +1,88 @@
 <?php 
-  session_start();
-  include ("lib/db.php");
-  include ("lib/misc.php");
-  include ("lib/dashboard_lib.php");
+session_start();
+include ("lib/db.php");               //Funciones encargadas de la BD
+include ("lib/misc.php");             //Funciones compartidas en todos los formularios
 
+
+////Funciones del formulario
+
+  //Se obtienen los usuarios registrados
+  function getRegistredUsers(){
+    echo(array_values(select("select count(*) from usuario")[0])[0]);
+  }
+
+  //Se obtienen los productos registrados
+  function getRegistredProducts(){
+    echo(array_values(select("select count(*) from producto")[0])[0]);
+  }
+
+  //Se optiene el top de los productos mas vendidos
+  function getTopProduct(){
+    $id=array_values(select("select codigo_producto, count(*) from venta_producto group by codigo_producto")[0])[0];
+    
+    echo(array_values(select("select nombre from producto where codigo='".$id."'")[0])[0]);
+  }
+
+  //Se obtiene el total de ventas
+  function getDailySales(){
+    $date=date_create("now");
+    $date=date_format($date,"Y-m-d");
+    echo(array_values(select("select count(*) from venta where fecha='".$date."'")[0])[0]);
+  }
+
+  //Se llena la grafica de los usuarios admin activos e inactivos
+  function getUserAdminChart(){
+    $admin = array_values(select("select count(*) from usuario where nivel=0 and activo=1")[0])[0];
+    $user = array_values(select("select count(*) from usuario where nivel=1 and activo=1")[0])[0];
+    echo('{label: "Administradores", value: '.$admin.'},
+              {label: "Empleados", value: '.$user.'},');
+  }
+
+  //Se llena la grafica con los productos mas caros
+  function getMostExpensive(){
+    $lista=select('select nombre, precio from producto where activo=1 order by precio desc limit 5');
+
+    for($i=0;$i<sizeof($lista);$i++){
+      echo('{mapname: "'.array_values($lista[$i])[0].'", label: "'.array_values($lista[$i])[0].'", value: '.array_values($lista[$i])[1].'},');
+    }    
+  }
+
+  //Se llena la grafica con los tipos de productos
+  function getTypes(){
+    $lista=select('select id_tipo, count(*) from producto where activo=1 group by id_tipo limit 5');
+
+    for($i=0;$i<sizeof($lista);$i++){
+      echo('{mapname: "'.array_values(select("select nombre from tipo_producto where id='".array_values($lista[$i])[0]."'")[0])[0].'", label: "'.array_values(select("select nombre from tipo_producto where id='".array_values($lista[$i])[0]."'")[0])[0].'", value: '.array_values($lista[$i])[1].'},');
+    }       
+  }
+
+  //Se llena la grafica con los usuarios activos e inactivos
+  function activeAndInactive(){
+    $admin = array_values(select("select count(*) from usuario where activo=0")[0])[0];
+    $user = array_values(select("select count(*) from usuario where activo=1")[0])[0];
+    echo('{label: "Activos", value: '.$admin.'},
+              {label: "Inactivos", value: '.$user.'},');
+  }
+
+  //Se llena la grafica con los productos activos e inactivos
+  function prod_activeAndInactive(){
+    $activo = array_values(select("select count(*) from producto where activo=1")[0])[0];
+    $inactivo = array_values(select("select count(*) from producto where activo=0")[0])[0];
+    echo('{label: "Activos", value: '.$activo.'},
+              {label: "Inactivos", value: '.$inactivo.'},');
+  }
+
+  //Se obtiene la grafica con las ventas diarias
+  function getDateGraph(){
+    $lista=select('select fecha, SUM(total), count(*) from venta group by fecha limit 10');
+
+    for($i=0;$i<sizeof($lista);$i++){
+      echo('{week:"'.array_values($lista[$i])[0].'", "venta":"'.array_values($lista[$i])[1].'",  "precio":'.array_values($lista[$i])[1].'},');
+     }
+  }
+
+
+  //Se revisa que la conexion tenga una sesion activa sino se redirige al index.php
   if (empty($_SESSION["logg"]))
     header('Location: /final/index.php');
 ?>
@@ -11,7 +90,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>SimpleAdmin - Responsive Admin Dashboard Template</title>
+        <title>Dashboard</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
         <meta content="Coderthemes" name="author" />
@@ -26,8 +105,6 @@
         <link href="assets/css/bootstrap.min.css" rel="stylesheet">
         <!-- MetisMenu CSS -->
         <link href="assets/css/metisMenu.min.css" rel="stylesheet">
-                <!--Morris Chart CSS -->
-    <link rel="stylesheet" href="assets/plugins/morris/morris.css">
 
         <!-- Icons CSS -->
         <link href="assets/css/icons.css" rel="stylesheet">
@@ -43,9 +120,7 @@
         <link href="assets/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
         <link href="assets/plugins/clockpicker/css/bootstrap-clockpicker.min.css" rel="stylesheet">
         <link href="assets/plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-
         <link href="assets/plugins/fullcalendar/css/fullcalendar.min.css" rel="stylesheet" />
-
 
         <!-- Icons CSS -->
         <link href="assets/css/icons.css" rel="stylesheet">
@@ -98,14 +173,17 @@
                           <h4 style="margin-left: 25px;">Mensaje del Dia</h4>
                         </div>
                         <div class="pull-left" style="padding-left: 10px; padding-top: 8px;">
-                          <a href="motd.php"><button class="btn btn-icon btn-info btn-xs"> <i class="fa fa-wrench"></i> </button></a>
+                          <?php
+                            if(get_role_usrbyID($_SESSION['id'])==0)
+                              echo('<a href="motd.php"><button class="btn btn-icon btn-info btn-xs"> <i class="fa fa-wrench"></i> </button></a>');
+                          ?>
                         </div>
                       <?php
                         motd();
                       ?>
                     </div>
                   </div>
-                  <div class="card-box widget-inline">
+                  <div class="card-box widget-inline" style=" width: 100%;"">
                     <div class="row">
                       <div class="col-lg-3 col-sm-6">
                         <div class="widget-inline-box text-center">
@@ -148,57 +226,62 @@
 
                     </div>
                   </div>
-                  <h4 style="padding-left: 20px;"> Distribucion de usuarios </h4>
-                  <div id="grafica_cantidad_top_productos" style="height: 250px;"></div>
-                  <div class="row">
-                          <div style="padding-left:40px" class="col-lg-6 col-sm-6">
-                            <h4> Distribucion de usuarios </h4>
-                          </div>
-                          <div style="padding-left:40px" class="col-lg-6 col-sm-6">
-                            <h4> Productos mas caros<h4>
-                          </div>
-                     </div>
-                  <div class="row">
-                     
-                      <div class="row">
-                        <br><br>
-                         
-                         <div class="col-lg-3 col-sm-3">
-                          <br><br>
-                              <div id="usuarios_activosEInactivos" style="height: 250px;"></div>
-                         </div>
-                          <div class="col-lg-3 col-sm-3">
-                            <br><br>
-                              <div id="usuarios_y_administradores" style="height: 250px;"></div>
-                          </div>
-                          <div class="col-lg-6 col-sm-6">
-                             <div style="padding-left:40px" class="col-lg-11 col-sm-11">
-                            
+
+                  <?php
+                  if(get_role_usrbyID($_SESSION['id'])==0)
+                  echo('
+                    <h4 style="padding-left: 20px;"> Distribucion de usuarios </h4>
+                    <div id="grafica_cantidad_top_productos" style="height: 250px;"></div>
+                    <div class="row">
+                            <div style="padding-left:40px" class="col-lg-6 col-sm-6">
+                              <h4> Distribucion de usuarios </h4>
                             </div>
-                              <div id="productos_mas_caros" style="height: 250px;"></div>
-                          </div>
-                    </div>
-                  </div>
-                  <br><br>
-                  <div class="row">
-                     <div class="row">
-                        
-                        <div class="col-lg-6 col-sm-6">
-                          <div style="padding-left:40px" class="col-lg-11 col-sm-11">
-                            <h4> Tipos de Producto mas Vendidos </h4>
-                          </div>
-                          <div id="tipos_producto" style="height: 250px;"></div>
-                        </div>
-                        <div class="col-lg-6 col-sm-6">
-                          <div style="padding-left:40px" class="col-lg-11 col-sm-11">
-                            <h4> Estado de productos </h4>
-                          </div>
-                          <div id="productos_activosEInactivos" style="height: 250px;"></div>
-                        </div>
+                            <div style="padding-left:40px" class="col-lg-6 col-sm-6">
+                              <h4> Productos mas caros<h4>
+                            </div>
+                       </div>
+                    <div class="row">
+                       
+                        <div class="row">
+                          <br><br>
+                           
+                           <div class="col-lg-3 col-sm-3">
+                            <br><br>
+                                <div id="usuarios_activosEInactivos" style="height: 250px;"></div>
+                           </div>
+                            <div class="col-lg-3 col-sm-3">
+                              <br><br>
+                                <div id="usuarios_y_administradores" style="height: 250px;"></div>
+                            </div>
+                            <div class="col-lg-6 col-sm-6">
+                               <div style="padding-left:40px" class="col-lg-11 col-sm-11">
+                              
+                              </div>
+                                <div id="productos_mas_caros" style="height: 250px;"></div>
+                            </div>
                       </div>
                     </div>
+                    <br><br>
                     <div class="row">
-                    <div style="height: 150px";"></div>
+                       <div class="row">
+                          
+                          <div class="col-lg-6 col-sm-6">
+                            <div style="padding-left:40px" class="col-lg-11 col-sm-11">
+                              <h4> Tipos de Producto mas Vendidos </h4>
+                            </div>
+                            <div id="tipos_producto" style="height: 250px;"></div>
+                          </div>
+                          <div class="col-lg-6 col-sm-6">
+                            <div style="padding-left:40px" class="col-lg-11 col-sm-11">
+                              <h4> Estado de productos </h4>
+                            </div>
+                            <div id="productos_activosEInactivos" style="height: 250px;"></div>
+                          </div>
+                        </div>
+                      </div>');
+                      ?>
+                    <div class="row">
+                    <div style="height: 100px";"></div>
                     <h4 style="padding-left:40px"> Actividades del mes</h4>
                     </div>
                     <div id='calendar'></div>
@@ -234,36 +317,30 @@
 		    <script src="assets/plugins/morris/morris.min.js"></script>
 		    <script src="assets/plugins/raphael/raphael-min.js"></script>
 
-        <!-- SweetAlert-->
-        <script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
-        <script src="assets/pages/jquery.sweet-alert.init.js"></script>
 
         <!-- Dashboard init -->
 		    <script src="assets/pages/jquery.dashboard.js"></script>
 
         <!-- App Js -->
         <script src="assets/js/jquery.app.js"></script>
-
-        <!-- fun-->
-        <script src="lib/fun.js"></script>
-
-        <!-- BEGIN PAGE SCRIPTS -->
+        
         <script src="assets/plugins/moment/moment.js"></script>
         <script src='assets/plugins/fullcalendar/js/fullcalendar.min.js'></script>
         <script src="assets/pages/jquery.fullcalendar.js"></script>
 
 
+        <!-- Logout-->
+        <script src="lib/fun.js"></script>
+
         <script>
-
+          //Creando calendario simple
           $(document).ready(function() {
-
-              // page is now ready, initialize the calendar...
-
               $('#calendar').fullCalendar({
-                  // put your options and callbacks here
               })
 
           });
+
+          //Grafica top de productos
           Morris.Line({
                 element:'grafica_cantidad_top_productos',
                 data: [           
@@ -273,33 +350,29 @@
                  ],
                  xkey: 'week', 
                  ykeys: ['venta'],
-                 labels: ['precio'],
+                 labels: ['Total de venta del dia'],
                  parseTime:false,
                  hideHover:true,
                  lineWidth:'6px',
                  stacked: true           
              
           });
+
+          //Grafica con los tipos de productos
           new Morris.Bar({
-          // ID of the element in which to draw the chart.
           element: 'tipos_producto',
-          // Chart data records -- each entry in this array corresponds to a point on
-          // the chart.
           data: [
             <?php
               getTypes();
             ?>
 
           ],
-          // The name of the data record attribute that contains x-values.
           xkey: 'mapname',
-          // A list of names of data record attributes that contain y-values.
           ykeys: ['value'],
-          // Labels for the ykeys -- will be displayed when you hover over the
-          // chart.
-          labels: ['Value']
+          labels: ['Cantidad']
           });
 
+          //Grafica con los productos activos e inactivos
            Morris.Donut({
             element: 'productos_activosEInactivos',
             data: [
@@ -310,6 +383,7 @@
             ]
           });
 
+           //Grafica con los usuarios activos e inactivos
            Morris.Donut({
             element: 'usuarios_activosEInactivos',
             data: [
@@ -320,6 +394,7 @@
             ]
           });
 
+           //Grafica con los usuarios y adminsitradores
                Morris.Donut({
             element: 'usuarios_y_administradores',
             data: [
@@ -331,12 +406,9 @@
           });
 
 
-          
+          //Grafica con los productos mas caros  
           new Morris.Bar({
-          // ID of the element in which to draw the chart.
           element: 'productos_mas_caros',
-          // Chart data records -- each entry in this array corresponds to a point on
-          // the chart.
           data: [
           
                     <?php
@@ -344,17 +416,10 @@
             ?>
    
           ],
-          // The name of the data record attribute that contains x-values.
           xkey: 'mapname',
-          // A list of names of data record attributes that contain y-values.
           ykeys: ['value'],
-          // Labels for the ykeys -- will be displayed when you hover over the
-          // chart.
-          labels: ['Value']
+          labels: ['Precio']
           });
-
-
-
 
         </script>
 

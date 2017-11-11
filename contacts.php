@@ -1,9 +1,40 @@
 <?php 
   session_start();
-  include ("lib/db.php");
-  include ("lib/misc.php");
-  include ("lib/contacts_lib.php");
+  include ("lib/db.php");               //Funciones encargadas de la BD
+  include ("lib/misc.php");             //Funciones compartidas en todos los formularios
 
+  /////Funciones del formulario
+
+    //Funcion que llena el formulario con la informacion de todos usuarios administradores, mostrando su fotografia, nombre, telefono, email.
+    function allcontacts(){
+        $id_users=select("select CONCAT(nombre,' ',apellido_paterno,' ', apellido_materno), email, fotografia, telefono, id from usuario where nivel=0 and activo=1");
+        
+        for($i=0;$i<sizeof($id_users);$i++){
+            echo('
+                <div class="col-md-4">
+                <div class="text-center card-box">
+                <div class="clearfix"></div>
+                <div class="member-card" style=" height:250px">
+                <div class="thumb-xl member-thumb m-b-10 center-block">
+                <img src="'.array_values($id_users[$i])[2].'" class="img-circle img-thumbnail" alt="profile-image">
+                <i class="mdi mdi-star-circle member-star text-success" title="Usuario Administrador"></i>
+                </div>
+
+                <div class="">
+                <h4 class="m-b-5">'.array_values($id_users[$i])[0].'</h4>
+                <p class="text-muted">'.array_values($id_users[$i])[3].' <span> | <span> <a href="#" class="text-pink">'.array_values($id_users[$i])[1].'</a> </span></p>
+                </div>
+
+                
+                <a href="profile.php?id='.array_values($id_users[$i])[4].'"><button type="button" class="btn btn-default btn-sm m-t-10">Ver Perfil</button></a>
+                </div>
+                </div>
+                </div>'
+            );
+        }
+    }
+
+  //Se revisa que la conexion tenga una sesion activa sino se redirige al index.php
   if (empty($_SESSION["logg"]))
     header('Location: /final/index.php');
 ?>
@@ -11,7 +42,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>SimpleAdmin - Responsive Admin Dashboard Template</title>
+        <title>Contactos</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
         <meta content="Coderthemes" name="author" />
@@ -19,13 +50,8 @@
 
         <link rel="shortcut icon" href="assets/images/favicon.ico">
 
-        <!--Morris Chart CSS -->
-		    <link rel="stylesheet" href="assets/plugins/morris/morris.css">
-
         <!-- Bootstrap core CSS -->
         <link href="assets/css/bootstrap.min.css" rel="stylesheet">
-        <!-- MetisMenu CSS -->
-        <link href="assets/css/metisMenu.min.css" rel="stylesheet">
         <!-- Icons CSS -->
         <link href="assets/css/icons.css" rel="stylesheet">
         <!-- Custom styles for this template -->
@@ -64,7 +90,7 @@
             <div class="page-contentbar">
 
                 <!--left navigation start-->
-                 <?php
+                <?php
                   page_print_leftsidemenu();
                 ?>
                 <!--left navigation end-->
@@ -72,14 +98,9 @@
                 <!-- START PAGE CONTENT -->
                 <div id="page-right-content">
                   <!-- Logo and name -->
-                  <div class="row">
-                    <div class="col-sm-1 col-md-4 col-lg-1">
-                      <span class="ti-home gi-5x" style="font-size: 60px; padding-left: 10px;" ></span> 
-                    </div>
-                    <div class="col-sm-11 col-md-8 col-lg-11">
-                      <h1> Contacto </h1>
-                    </div>
-                  </div>
+                  <div class="col-sm-12 col-md-12 col-lg-12">
+                    <h1 style="color:#D52B2B;"><span class="mdi mdi-face gi-5x" style="font-size: 60px; padding-left: 10px;" ></span>  Contacto</h1>
+                </div>
 
                   <div style='overflow:auto; width:100%;height:100%;'>
                   <?php
@@ -108,24 +129,8 @@
         <!-- js placed at the end of the document so the pages load faster -->
         <script src="assets/js/jquery-2.1.4.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>
-        <script src="assets/js/metisMenu.min.js"></script>
         <script src="assets/js/jquery.slimscroll.min.js"></script>
-
-        <!--Morris Chart-->
-		    <script src="assets/plugins/morris/morris.min.js"></script>
-		    <script src="assets/plugins/raphael/raphael-min.js"></script>
-
-        <!-- SweetAlert-->
-        <script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
-        <script src="assets/pages/jquery.sweet-alert.init.js"></script>
-
-        <!-- Dashboard init -->
-		    <script src="assets/pages/jquery.dashboard.js"></script>
-
-        <!-- App Js -->
-        <script src="assets/js/jquery.app.js"></script>
-
-        <!-- fun-->
+        <!-- Logout-->
         <script src="lib/fun.js"></script>
 
     </body>

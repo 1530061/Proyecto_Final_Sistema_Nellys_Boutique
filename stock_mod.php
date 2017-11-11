@@ -1,15 +1,15 @@
 <?php 
 session_start();
-include ("lib/db.php");
-include ("lib/misc.php");
-include ("lib/stock_lib.php");
+include ("lib/db.php");               //Funciones encargada de la BD
+include ("lib/misc.php");             //Funciones compartidas en todos los formularios
+include ("lib/stock_lib.php");		  //Funciones llenado de tablas busqueda
 
 if (empty($_SESSION["logg"]))
 	header('Location: /final/index.php');
 ?>
 
 
-<?php // here start your php file
+<?php 
 ob_get_contents();
 ob_end_clean();
 ?>
@@ -18,7 +18,7 @@ ob_end_clean();
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>Eliminar Usuario</title>
+	<title>Modificar Producto</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
 	<meta content="Coderthemes" name="author" />
@@ -105,42 +105,34 @@ ob_end_clean();
 			<!-- START PAGE CONTENT -->
 			<div id="page-right-content">
 				<!-- Logo and name -->
-				<div class="row" style="height:70px;">
-					<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-						<span class="mdi mdi-autorenew" style="font-size: 60px; padding-left: 10px;" ></span> 
-					</div>
-					<div class="col-sm-11 col-md-8 col-lg-11">
-						<h1 style="color:#D52B2B;"> Modificar Producto </h1>
-					</div>
+				
+				<div class="col-sm-12 col-md-12 col-lg-12">
+					<h1 style="color:#D52B2B;"><span class="mdi mdi-autorenew" style="font-size: 60px; padding-left: 10px;" ></span>  Modificar Producto </h1>
+					<?php
 
+
+					if($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) &&
+						empty($_FILES) && $_SERVER['CONTENT_LENGTH'] > 0)
+					{
+						echo('<div class="alert alert-danger alert-dismissible fade in" role="alert">
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">×</span>
+							</button>
+							<strong> La imagen excede el tamaño permitido (>8MB)
+							</div>');
+					}
+					if(isset($_POST["prod_cod"])){	
+						$file=$_FILES['userfile']['name'];
+						$tmp=$_FILES['userfile']['tmp_name'];
+
+						update_prod($file, $tmp);
+					}
+					?>
+					<br>
 				</div>
-
-
-
-				<?php
-
-
-				if($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) &&
-					empty($_FILES) && $_SERVER['CONTENT_LENGTH'] > 0)
-				{
-					echo('<div class="alert alert-danger alert-dismissible fade in" role="alert">
-						<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-						<span aria-hidden="true">×</span>
-						</button>
-						<strong> La imagen excede el tamaño permitido (>8MB)
-						</div>');
-				}
-				if(isset($_POST["prod_cod"])){
-					
-					$file=$_FILES['userfile']['name'];
-					$tmp=$_FILES['userfile']['tmp_name'];
-
-					update_prod($file, $tmp);
-					
-					//$values=[$_POST["name"],$_POST["usr"],$_POST["p"];
-					
-				}
-				?>
+				
+				
+				
 				<div class="p-20 m-b-20">
 					<div id="error">
 					</div>
@@ -197,12 +189,6 @@ ob_end_clean();
 								</div>
 							
 							<br>
-
-							<!--
-						<div class="form-group">
-							<label for="prod_cod">Codigo<span class="text-danger">*</span></label>
-							<input type="text" name="prod_cod" parsley-trigger="change" required="" class="form-control" id="prod_cod" value="<?php err_print('prod_cod');?>">
-						</div>-->
 						<div class="form-group">
 							<label for="prod_name">Nombre<span class="text-danger">*</span></label>
 							<input type="text" name="prod_name" parsley-trigger="change" required="" class="form-control" id="prod_name" value="<?php err_print('prod_name');?>">
@@ -365,7 +351,9 @@ ob_end_clean();
 	<!-- App Js -->
 	<script src="assets/js/jquery.app.js"></script>
 
+
 	<script type="text/javascript">
+		//Previsualizacion de una imagen cargada
         function readURL(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
@@ -381,10 +369,7 @@ ob_end_clean();
 
 
 	<script>
-
-
 			//Select 2 buscador de nombres y usuarios
-			 //Elementos a modificar
 			$(document).ready(function() {
 				var select2 = $('.js-example-basic-single').select2({ placeholder: "Codigo o Nombre del Producto " });
 			});
@@ -400,6 +385,7 @@ ob_end_clean();
 					getOutput("'"+value+"'", $i);
 			})
 
+			//Creacion de la tabla
 			$(document).ready(function() {
 			    $('#exampletable').DataTable({
 			    	"searching": false,
@@ -409,11 +395,11 @@ ob_end_clean();
 				});
 			});
 
+			//Llamada de la tabla al hacer click
 			var elem = ["prod_name","prod_desc","prod_tipo","prod_talla","prod_precio", "prod_cant", "fotografia"];
 			function callFromTable(value){
 				document.getElementById('prod_cod').value= value;
 				document.getElementById("tabla_div").style.display = "none";
-				//document.getElementById('contain_form').scrollIntoView();
 			    $('html, body').animate({
 			        scrollTop: $("#contain_form").offset().top
 			    }, 500);
@@ -422,9 +408,7 @@ ob_end_clean();
 				}
 			}
 
-						// handles drawing an error message
-
-			// handles the click event for link 1, sends the query
+			//Resultado
 			function getOutput(id,tipo) {
 				getRequest(
 			      'lib/searchbycode_products.php?id="'+id+'"&t='+tipo, // URL for the PHP file
@@ -435,25 +419,22 @@ ob_end_clean();
 				return false;
 			}  
 
-			// handles drawing an error message
+			// Error
 			function drawError() {
 				var container = document.getElementById('output');
 				container.innerHTML = 'Bummer: there was an error!';
 			}
 			
 			var responsePrevTipo;
-			// handles the response, adds the html
+			// Respuesta
 			function drawOutput(responseText, tipo) {
-				//RADIOBUTTON GENERO
 				elem_id=elem[tipo];
 				if(tipo==2){
 					document.getElementById(elem_id).value= responseText;
-					//getOutput2(responseText);
 					responsePrevTipo=responseText;
 				}else if(tipo==3){
 					console.log(responseText);
 					getOutput2(responsePrevTipo, responseText);
-					//document.getElementById(elem_id).value=responseText;
 				}else if(tipo==6){
 					document.getElementById(elem_id).src= responseText;
 				}else{
@@ -465,14 +446,11 @@ ob_end_clean();
 			function getRequest(url, success, error, tipo) {
 				var req = false;
 				try{
-			        // most browsers
 			        req = new XMLHttpRequest();
 			    } catch (e){
-			        // IE
 			        try{
 			        	req = new ActiveXObject("Msxml2.XMLHTTP");
 			        } catch(e) {
-			            // try an older version
 			            try{
 			            	req = new ActiveXObject("Microsoft.XMLHTTP");
 			            } catch(e) {
@@ -493,17 +471,6 @@ ob_end_clean();
 			    req.send(null);
 			    document.getElementById("prodmod_from").style.display="block";
 			    return req;
-			}
-
-			function yesnoCheck(that) {
-				document.getElementById("emg").style.display = "none";
-				document.getElementById("telf").style.display = "none";
-				document.getElementById("sum").style.display = "none";
-			}
-			function yesnoCheck2(that) {
-				document.getElementById("emg").style.display = "block" 
-				document.getElementById("telf").style.display = "block";
-				document.getElementById("sum").style.display = "block";
 			}
 		</script>
 
@@ -529,10 +496,10 @@ ob_end_clean();
 
 		function getOutput2(id,talla) {
 			getRequest2(
-		      'lib/searchsize.php?id_tipo='+id+'&talla='+talla, // URL for the PHP file
-		       drawOutput2,  // handle successful request
+		      'lib/searchsize.php?id_tipo='+id+'&talla='+talla, 
+		       drawOutput2,  
 		       drawError,
-		       id  // handle error
+		       id  
 		       );
 			return false;
 		}  
@@ -585,8 +552,8 @@ ob_end_clean();
 		</script>
 
 		<?php
+			//Muestra error y llama objeto
 			if(isset($_GET['id'])){
-				//$id="'".$_GET['id']."'";
 				$exists=array_values(select("select codigo from producto where codigo='".$_GET['id']."'")[0])[0];
 				if($exists!="0"){
 					echo '<script type="text/javascript">',

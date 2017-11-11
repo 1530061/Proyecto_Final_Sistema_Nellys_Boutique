@@ -1,9 +1,41 @@
 <?php 
 session_start();
-include ("lib/db.php");
-include ("lib/misc.php");
-include ("lib/sale_lib.php");
+include ("lib/db.php");               //Funciones encargada de la BD
+include ("lib/misc.php");             //Funciones compartidas en todos los formularios
 
+/////Funciones del formulario
+
+	//Funcion que llena las opciones con los id y nombres de los productos simulando un buscador
+	function fill_search_prod(){
+		$user_info = select("select codigo from producto where activo=1");
+		echo('<optgroup label="Codigo">');
+		for($i=0;$i<count($user_info);$i++){
+			echo('<option value="'.array_values($user_info[$i])[0].'">'.array_values($user_info[$i])[0].'</option>');
+		}
+		echo('<optgroup label="Nombre">');
+		$user_info = select("select codigo, nombre from producto where activo=1");
+		for($i=0;$i<count($user_info);$i++){
+			echo('<option value="'.array_values($user_info[$i])[0].'">'.array_values($user_info[$i])[1].'</option>');
+		}
+	}	
+
+	//Funcion que retorna el nombre del cajero
+	function get_name_cashier(){
+		$nombre = array_values(select("select CONCAT(nombre,' ',apellido_paterno,' ', apellido_materno) from usuario where id=".$_SESSION["id"]."")[0])[0];
+		echo('<h6>'.
+			$nombre
+			.'</h6>');
+	}
+
+	//Funcion que retorna la fecha 
+	function get_date(){
+		$dateTime = new DateTime('now'); 
+		echo('<h6 id="fecha">'.
+			$dateTime->format("l, d F Y    h:i A")
+			.'</h6>');
+	}
+
+//Se revisa que la conexion tenga una sesion activa sino se redirige al index.php
 if (empty($_SESSION["logg"]))
 	header('Location: /final/index.php');
 ?>
@@ -18,7 +50,7 @@ ob_end_clean();
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>SimpleAdmin - Responsive Admin Dashboard Template</title>
+	<title>Venta</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
 	<meta content="Coderthemes" name="author" />
@@ -210,17 +242,7 @@ ob_end_clean();
 											</span>
 										</h2>
 									</div>
-								</div><!--
-									<div class ="row">
-	                              		<div class="col-sm-1 col-lg-4">
-	                              			<h5>Descripcion</h5>
-	                              		</div>
-
-										<div class="col-sm-1 col-lg-8">
-											<textarea  readonly cols="35" rows="5" style="border: none; overflow:hidden;resize: none; padding-top: 10px;">Un buen vestido de un buen color que gjaldf dasjd fasjldfla  e er er df dsfasdfasdf fsjaflk. que falsdfjsdfjhaskdf dyf asdfjsdhflksd fmcmcmcmjeueueu daskks.
-											</textarea>
-	                              		</div>
-	                              	</div>-->
+								</div>
                               	<div class ="row">
                               		<h5 hidden id="codigo"></h5>
                               		<div class="col-sm-1 col-lg-4" style="padding-top:15px;">
@@ -360,7 +382,7 @@ ob_end_clean();
         <script src="lib/fun.js"></script>
 
         	<script>
-
+        	//Dibujado de la tabla que contiene los productos de la venta actual
         	var table;
 			$(document).ready(function() {
 			    table=$('#exampletable').DataTable({
@@ -374,50 +396,46 @@ ob_end_clean();
 				});
 			});
 
-			var holder=[];
+			var holder=[];	//Contenedora de los valores del producto en pantalla
+
+			//Buscador de productos
 			$(document).ready(function() {
 				var select2 = $('.js-example-basic-single').select2({ placeholder: "Codigo o Nombre del Producto " });
 			});
+
+			//Al existir cambio en el select, se llenara la parte derecha del formulario llamando el archivo sale_lib para
+			//obtener los valores del producto.
 			$('.js-example-basic-single').on('change', function() {
 				document.getElementById("cantidad").value="1";
 				var $select = $(".js-example-basic-single").parent().find("select"); // it's <select> element
 				var value = $select.val(); 
-				//alert(value);
 				document.getElementById("codigo").innerHTML = value;
 				holder[0]=value;
 				$.ajax({url: "lib/sale_lib.php?type=1&cod="+value}).done(function( html ) {
-					//alert(html);
 					document.getElementById("img_actual").src = html;
-				    //$(".img_actual").append(html);
 				});
 				$.ajax({url: "lib/sale_lib.php?type=2&cod="+value}).done(function( html ) {
-					//alert(html);
 					document.getElementById("precio").innerHTML = "$"+html;
 					holder[4]=html;
-				    //$(".img_actual").append(html);
 				});
 				$.ajax({url: "lib/sale_lib.php?type=3&cod="+value}).done(function( html ) {
-					//alert(html);
 					document.getElementById("nombre").innerHTML = html;
 					holder[1]=html;
-				    //$(".img_actual").append(html);
 				});
 				$.ajax({url: "lib/sale_lib.php?type=4&cod="+value}).done(function( html ) {
-					//alert(html);
 					document.getElementById("talla").innerHTML = html;
 					holder[2]=html;
-				    //$(".img_actual").append(html);
 				});
 			})
 			var arr = [[]];
 			var total_venta=0;
+
+			//Funcion para agregar un producto a la tabla de la venta
 			function agregar_btn(){
-			
 				if(holder[0]!="" && holder[0]!=null){
 					holder[3]=document.getElementById("cantidad").value;
 					len=arr.length-1;
 					var pos=0;
-					//alert(arr.length);
 					for(i=1;i<arr.length;i++){
 						if(arr[i][0]==holder[0]){
 							pos=i;
@@ -446,9 +464,6 @@ ob_end_clean();
 					}
 					total_venta=total;
 					document.getElementById("total_venta").innerHTML="$"+total;
-					//for(i=0;i<4;i++){
-				//	holder[i]="";
-				//}
 				}else{
 					document.getElementById("error").innerHTML='<div class="alert alert-danger alert-dismissible fade in" role="alert" style="margin-bottom:0px; margin-left:10px; margin-right:10px;"><button type="button" class="close" data-dismiss="alert" aria-label="Close" ><span aria-hidden="true">×</span></button><strong>Producto no encontrado</strong></div><br>';
 						for(i=0;i<4;i++){
@@ -460,11 +475,10 @@ ob_end_clean();
 						document.getElementById("cantidad").value="1";
 						document.getElementById("precio").innerHTML="$0";
 						document.getElementById("img_actual").src="prod_img/0.png";
-				}
-				
-				
-				
+				}	
 			}
+
+			//Permite borrar el objeto actual de la pantalla
 			function delete_btn(){
 				for(i=0;i<4;i++){
 					holder[i]="";
@@ -476,10 +490,14 @@ ob_end_clean();
 				document.getElementById("precio").innerHTML="$0";
 				document.getElementById("img_actual").src="prod_img/0.png";
 			}
+
+			//Permite actualizar el precio del producto en la pantalla en razon de la cantidad que existan en la venta
 			function update_price(){
 				if(document.getElementById("cantidad").value!=null && holder[4]!=null)
 					document.getElementById("precio").innerHTML="$"+(parseFloat(holder[4])*parseFloat(document.getElementById("cantidad").value));
 			}
+
+			//Reinicia la venta, limpiando los campos y las variables.
 			function reset_sale(){
 				for(i=0;i<4;i++){
 					holder[i]="";
@@ -493,20 +511,33 @@ ob_end_clean();
 				document.getElementById("body").innerHTML="";
 				arr=[[]];
 			}
+
+			//Finaliza la venta guardandola en la base de datos, utiliza una llamada doble de ajax, en la que primeramente se hace
+			//una insercion a la tabla venta y se obtiene el id de la venta creada, luego se hace una insercion en la tabla producto
+			//venta por cada uno de los elementos que se encuentren en la variable arr que refleja la tabla de la pantalla igualmente
+			//haciendo uso de ajax, para finalmente limpiar las variables y mostrar mensajes de error o de exito.
 			function terminar_venta(){
 				var id = '<?php echo $_SESSION["id"]; ?>';
-			
-				var id_venta;
-				$.ajax({url: "lib/sale_lib.php?action=1&fecha="+document.getElementById("fecha").innerHTML+"&total="+total_venta+"&id="+id}).done(function( html ) {
+				if(arr.length>1){
+					var id_venta;
+					$.ajax({url: "lib/sale_lib.php?action=1&fecha="+document.getElementById("fecha").innerHTML+"&total="+total_venta+"&id="+id}).done(function( html ) {
 
-					id_venta=html;
-					for(i =1;i<arr.length;i++){
-						$.ajax({url: "lib/sale_lib.php?action=2&id="+id_venta+"&codigo="+arr[i][0]+"&cantidad="+arr[i][3]}).done(function( html ) {
-						});
-					}
-				});
-				reset_sale();
-				document.getElementById("error").innerHTML='<div class="alert alert-success alert-dismissible fade in" role="alert" style="margin-bottom:0px; margin-left:10px; margin-right:10px;"><button type="button" class="close" data-dismiss="alert" aria-label="Close" ><span aria-hidden="true">×</span></button><strong>Venta realizada exitosamente.</strong></div><br>';
+						id_venta=html;
+
+						for(i =0;i<arr.length;i++){
+
+							$.ajax({url: "lib/sale_lib.php?action=2&id="+id_venta+"&codigo="+arr[i][0]+"&cantidad="+arr[i][3]}).done(function( html ) {
+							});
+						}
+						document.getElementById("error").innerHTML='<div class="alert alert-success alert-dismissible fade in" role="alert" style="margin-bottom:0px; margin-left:10px; margin-right:10px;"><button type="button" class="close" data-dismiss="alert" aria-label="Close" ><span aria-hidden="true">×</span></button><strong>Venta realizada exitosamente con el id['+id_venta+'].</strong></div><br>';
+						reset_sale();
+						
+					});
+					
+				}else{
+					document.getElementById("error").innerHTML='<div class="alert alert-danger alert-dismissible fade in" role="alert" style="margin-bottom:0px; margin-left:10px; margin-right:10px;"><button type="button" class="close" data-dismiss="alert" aria-label="Close" ><span aria-hidden="true">×</span></button><strong>Ingrese productos a la venta.</strong></div><br>';
+				}
+				
 			}
 		</script>
 	</body>

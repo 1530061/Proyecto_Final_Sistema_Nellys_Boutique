@@ -1,16 +1,63 @@
 <?php 
 session_start();
-include ("lib/db.php");
-include ("lib/misc.php");
-include ("lib/timelapse_lib.php");
+include ("lib/db.php");               //Funciones encargada de la BD
+include ("lib/misc.php");             //Funciones compartidas en todos los formularios
 
+//Funcion que llena el formulario, con las ventas que se han realizado asi como su cantidad de productos, total y id
+function fill_time_lapse(){
+	$fechas_venta = select("select fecha from venta group by fecha");
+
+
+	for($i=0;$i<sizeof($fechas_venta);$i++){
+		echo('	<article class="timeline-item alt">
+                    <div class="text-right">
+                        <div class="time-show first">
+                            <a href="#" class="btn btn-custom">'.array_values($fechas_venta[$i])[0].'</a>
+                        </div>
+                    </div>
+                </article>');
+		
+		$ventas_dia=select("select id, total, id_usuario from venta where fecha='".array_values($fechas_venta[$i])[0]."'");
+		for($j=0;$j<sizeof($ventas_dia);$j++){
+			if($j%2==0){
+				echo('<article class="timeline-item alt">');
+				echo('<div class="timeline-desk">
+                            <div class="panel">
+                                <div class="timeline-box">
+                                    <span class="arrow-alt"></span>
+                                    <span class="timeline-icon"><i class="mdi mdi-checkbox-blank-circle-outline"></i></span>
+                                    <h4 class="">$'.array_values($ventas_dia[$j])[1].'</h4>
+                                    <p class="timeline-date text-muted"><small> Con el ID: '.array_values($ventas_dia[$j])[0].'</small></p>
+                                    <p>Se llevaron '.array_values(select("select sum(cantidad) from venta_producto where id_venta=".array_values($ventas_dia[$j])[0]."")[0])[0].' productos en la venta.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>');
+			}else{
+				echo('<article class="timeline-item">');
+				echo('<div class="timeline-desk">
+                            <div class="panel">
+                                <div class="timeline-box">
+                                    <span class="arrow-alt"></span>
+                                    <span class="timeline-icon"><i class="mdi mdi-checkbox-blank-circle-outline"></i></span>
+                                    <h4 class="">$'.array_values($ventas_dia[$j])[1].'</h4>
+                                    <p class="timeline-date text-muted"><small> Con el ID: '.array_values($ventas_dia[$j])[0].'</small></p>
+                                    <p>Se llevaron '.array_values(select("select sum(cantidad) from venta_producto where id_venta=".array_values($ventas_dia[$j])[0]."")[0])[0].' productos en la venta.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>');
+			}
+		}
+	}
+}
 
 if (empty($_SESSION["logg"]))
 	header('Location: /final/index.php');
 ?>
 
 
-<?php // here start your php file
+<?php 
 ob_get_contents();
 ob_end_clean();
 ?>
@@ -112,14 +159,8 @@ ob_end_clean();
 			<!-- START PAGE CONTENT -->
 			<div id="page-right-content">
 				<!-- Logo and name -->
-				<div class="row" style="height:70px;">
-					<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-						<span class="mdi mdi-autorenew" style="font-size: 60px; padding-left: 10px;" ></span> 
-					</div>
-					<div class="col-sm-11 col-md-8 col-lg-11">
-						<h1 style="color:#D52B2B;"> Linea de tiempo con las ventas registradas</h1>
-					</div>
-
+				<div class="col-sm-12 col-md-12 col-lg-12">
+					<h1 style="color:#D52B2B;"><span class="mdi mdi-timelapse" style="font-size: 60px; padding-left: 10px;" ></span>  Linea de tiempo con las ventas registradas </h1>
 				</div>
 
 				 <div class="row">
@@ -224,53 +265,12 @@ ob_end_clean();
 	<script src="assets/js/jquery.app.js"></script>
 
 	<script type="text/javascript">
+		//Cambia el titulo de la pagina en relacion con el tiempo que se seleccione
 		var titleStart=document.getElementById("title").innerHTML;
         function hour() {
            	document.getElementById("title").innerHTML=titleStart+" "+document.getElementById("timepicker").value;
         }
     </script>
-
-	<script type="text/javascript">
-        function readURL(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-
-                reader.onload = function (e) {
-                    $('#prev_foto').attr('src', e.target.result);
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-    </script>
-
-
-	<script>
-			function open_del(id) {
-				window.open('stock_mod.php?id='+id,'_self');
-			}
-			function open_mod(id){
-				window.open('stock_del.php?id='+id,'_self');
-			}
-			
-			function open_supp(id){
-				window.open('stock_supply.php?id='+id,'_self');
-			}
-
-			$(document).ready(function() {
-			    $('#exampletable').DataTable( {
-			        dom: 'Bfrtip',
-			        buttons: [
-			            'copyHtml5',
-			            'excelHtml5',
-			            'csvHtml5',
-			            'pdfHtml5'
-			        ]
-			    } );
-			} );
-						
-
-		</script>
 
 	</body>
 	</html>

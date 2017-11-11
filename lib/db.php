@@ -1,11 +1,14 @@
 <?php
 
+//Parametros de conexion a la BD.
 $servername = "localhost";
 $username = "root";
 $password= "";
 //$password = "php34a5";
 $dbname = "nelly_db";
 
+
+//Funcion que se encarga de solicitar una conexion a la base de datos.
 function connect(){
 	global $servername, $username, $password, $dbname;
 	$conn = new mysqli($servername, $username, $password, $dbname);
@@ -15,6 +18,8 @@ function connect(){
 	return $conn;
 }
 
+//Funcion que hace una consulta a la base de datos, teniendo como entrada una cadena
+//de texto que retorna un arreglo de arreglos de tipo string.
 function select($query) {
 	$conn = connect();
 	$result = $conn->query($query);
@@ -31,6 +36,8 @@ function select($query) {
 	return $resArr; 
 }
 
+//Funcion que hace un borrado a la base de datos, teniendo como entrada una cadena
+//de texto que realiza la eliminacion.
 function delete($query){
 	$conn = connect();
 
@@ -40,12 +47,10 @@ function delete($query){
 	    return false;
 	$conn->close();
 }
-//$columns, $values, $table
+
+//Funcion que realiza una insercion a la base de datos, teniendo como entrada tres arreglos de tipo String, 
+//[1] Nombre de las columnas, [2] Valores, [3] Nombre de la tabla.
 function insert($columns, $values, $table){
-	/*
-	$columns=["nombre","apellido_paterno","apellido_materno","fecha_nac", "user", "pass","nivel","genero"];
-	$values=["'John'","'DOe'","'john@'","'2009-01-10 18:38:02'","'usr'","'pass'","0","'M'"];
-	$table="usuario";*/
 	if(sizeof($columns)==sizeof($values)){
 		$conn=connect();
 		$columns_string="(";
@@ -56,32 +61,25 @@ function insert($columns, $values, $table){
 		}
 		$columns_string=$columns_string.$columns[sizeof($columns)-1].")";
 		$values_string=$values_string.$values[sizeof($values)-1].")";
-		//echo($columns_string);
-		//echo($values_string);
-		
+
 		$sql = "INSERT INTO ".$table." ".$columns_string."
 		VALUES ".$values_string."";
 		$conn->query($sql);
-		/*
-		if ($conn->query($sql) === TRUE) {
-		    echo "New record created successfully";
-		} else {
-		    echo "Error: " . $sql . "<br>" . $conn->error;
-		}
-		*/
-
+		
 		$conn->close();
 	}else{
 		echo("erro");
 	}
 }
 
-function update($columns, $values, $table, $condition){
 
+//Funcion que realiza un update a la base de datos, teniendo como entrada tres arreglos de tipo String, 
+//[1] Nombre de las columnas, [2] Valores, [3] Nombre de la tabla y tambien una cadena de texto que contiene
+//la condicion que se debe de cumplir para realizar el update.
+function update($columns, $values, $table, $condition){
 	if(sizeof($columns)==sizeof($values)){
 		$conn=connect();
-		$string="";
-		
+		$string="";	
 		for($i=0;$i<sizeof($columns)-1;$i++){
 			$string=$string.$columns[$i]." = ".$values[$i]." ,";
 		}
@@ -89,22 +87,10 @@ function update($columns, $values, $table, $condition){
 		
 		$sql = "UPDATE ".$table." SET ".$string." ".$condition."";
 		$conn->query($sql);
-		/*
-		echo($sql);
-		
-		if ($conn->query($sql) === TRUE) {
-		    echo "New record created successfully";
-		} else {
-		    echo "Error: " . $sql . "<br>" . $conn->error;
-		}*/
-		
-
 		$conn->close();
 	}else{
 		echo("erro");
 	}
 }
-
-
 
 ?>

@@ -1,8 +1,28 @@
 <?php 
 session_start();
-include ("lib/db.php");
-include ("lib/misc.php");
-include ("lib/stock_lib.php");
+include ("lib/db.php");               //Funciones encargada de la BD
+include ("lib/misc.php");             //Funciones compartidas en todos los formularios
+include ("lib/stock_lib.php");		  //Funciones llenado de tablas busqueda
+
+	
+//Funciones del formulario
+
+	//Eliminar un producto quitando su estado de activo
+	function delete_product(){
+		$id=$_POST['prod_cod'];
+		$filepath=array_values(select("select fotografia from producto where codigo='".$id."'")[0])[0];
+		if($filepath!='prod_img\0.png' && substr($filepath,0,9)=='prod_img\\'){
+			unlink($filepath);
+		}
+		
+		$columns=["activo","fotografia"];
+		$values=['0',st('prod_img\\\\0.png')];
+		$table="producto";
+		$condition="where codigo='".$id."'";
+		update($columns,$values,$table,$condition);
+		sweetalert('Producto con el codigo['.$_POST["prod_cod"].'] eliminado correctamente.</strong>',"good");
+	}
+
 
 if (empty($_SESSION["logg"]))
 	header('Location: /final/index.php');
@@ -18,7 +38,7 @@ ob_end_clean();
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>Eliminar Usuario</title>
+	<title>Eliminar Producto</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
 	<meta content="Coderthemes" name="author" />
@@ -105,43 +125,33 @@ ob_end_clean();
 			<!-- START PAGE CONTENT -->
 			<div id="page-right-content">
 				<!-- Logo and name -->
-				<div class="row" style="height:70px;">
-					<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-						<span class="mdi mdi-delete-forever" style="font-size: 60px; padding-left: 10px;" ></span> 
-					</div>
-					<div class="col-sm-11 col-md-8 col-lg-11">
-						<h1 style="color:#D52B2B;"> Eliminar Producto </h1>
-					</div>
 
+				<div class="col-sm-12 col-md-12 col-lg-12">
+					<h1 style="color:#D52B2B;"><span class="mdi mdi-delete-forever" style="font-size: 60px; padding-left: 10px;" ></span>  Eliminar Producto </h1>
+					<?php
+								if($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) &&
+									empty($_FILES) && $_SERVER['CONTENT_LENGTH'] > 0)
+								{
+									echo('<div class="alert alert-danger alert-dismissible fade in" role="alert">
+										<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+										<span aria-hidden="true">×</span>
+										</button>
+										<strong> La imagen excede el tamaño permitido (>8MB)
+										</div>');
+								}
+								if(isset($_POST["prod_cod"])){			
+									delete_product();
+								}
+							?>
+							<br>
 				</div>
 
 
-
-				<?php
-
-
-				if($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) &&
-					empty($_FILES) && $_SERVER['CONTENT_LENGTH'] > 0)
-				{
-					echo('<div class="alert alert-danger alert-dismissible fade in" role="alert">
-						<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-						<span aria-hidden="true">×</span>
-						</button>
-						<strong> La imagen excede el tamaño permitido (>8MB)
-						</div>');
-				}
-				if(isset($_POST["prod_cod"])){
-					
 				
-					delete_product();
-					
-					//$values=[$_POST["name"],$_POST["usr"],$_POST["p"];
-					
-				}
-				?>
 				<div class="p-20 m-b-20">
 					<div id="error"></div>
 					<div class="row">
+
 						<div class= "col-lg-12">
 							<h3 style="color:#6A2E98;" class="header-title m-t-0"> Busqueda un solo producto</h3>
 							<h5 > <i class="mdi mdi-information-outline"></i> Ingrese en el buscador el codigo o el nombre de cualquier producto registrado para ver toda su informacion y modificarlo.</h5>
@@ -277,16 +287,10 @@ ob_end_clean();
 	<script src="assets/js/metisMenu.min.js"></script>
 	<script src="assets/js/jquery.slimscroll.min.js"></script>
 
-	<!--Morris Chart-->
-	<script src="assets/plugins/morris/morris.min.js"></script>
-	<script src="assets/plugins/raphael/raphael-min.js"></script>
 
 	<!-- SweetAlert-->
 	<script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
 	<script src="assets/pages/jquery.sweet-alert.init.js"></script>
-
-	<!-- Dashboard init -->
-	<script src="assets/pages/jquery.dashboard.js"></script>
 
 	<!-- App Js -->
 	<script src="assets/js/jquery.app.js"></script>
@@ -342,7 +346,7 @@ ob_end_clean();
 	<script src="assets/js/jquery.app.js"></script>
 
 	<script>
-		
+			//Alerta al eliminar
 			$(document).on('click', '#sub', function(e) {
 		    e.preventDefault();
 		    swal({
@@ -365,7 +369,6 @@ ob_end_clean();
 
 
 			//Select 2 buscador de nombres y usuarios
-			 //Elementos a modificar
 			$(document).ready(function() {
 				var select2 = $('.js-example-basic-single').select2({ placeholder: "Codigo o Nombre del Producto " });
 			});
@@ -381,6 +384,7 @@ ob_end_clean();
 					getOutput("'"+value+"'", $i);
 			})
 
+			//Creacion de tabla
 			$(document).ready(function() {
 			    $('#exampletable').DataTable({
 			    	"searching": false,
@@ -390,6 +394,7 @@ ob_end_clean();
 				});
 			});
 
+			//Funcion que se llama al hacer click en una fila
 			var elem = ["prod_name","prod_desc","prod_tipo","prod_talla","prod_precio", "prod_cant", "fotografia"];
 			function callFromTable(value){
 				document.getElementById('prod_cod').value= value;
@@ -403,7 +408,7 @@ ob_end_clean();
 				}
 			}
 
-			// handles the click event for link 1, sends the query
+			//Ajax llamada
 			function getOutput(id,tipo) {
 				getRequest(
 			      'lib/searchbycode_products.php?id="'+id+'"&t='+tipo, // URL for the PHP file
@@ -414,25 +419,22 @@ ob_end_clean();
 				return false;
 			}  
 
-			// handles drawing an error message
+			//Error
 			function drawError() {
 				var container = document.getElementById('output');
 				container.innerHTML = 'Bummer: there was an error!';
 			}
 			
 			var responsePrevTipo;
-			// handles the response, adds the html
+			//Manejador del resultado
 			function drawOutput(responseText, tipo) {
-				//RADIOBUTTON GENERO
 				elem_id=elem[tipo];
 				if(tipo==2){
 					document.getElementById(elem_id).value= responseText;
-					//getOutput2(responseText);
 					responsePrevTipo=responseText;
 				}else if(tipo==3){
 					console.log(responseText);
 					getOutput2(responsePrevTipo, responseText);
-					//document.getElementById(elem_id).value=responseText;
 				}else if(tipo==6){
 					document.getElementById(elem_id).src= responseText;
 				}else{
@@ -440,18 +442,14 @@ ob_end_clean();
 				}
 				
 			}
-			// helper function for cross-browser request object
 			function getRequest(url, success, error, tipo) {
 				var req = false;
 				try{
-			        // most browsers
 			        req = new XMLHttpRequest();
 			    } catch (e){
-			        // IE
 			        try{
 			        	req = new ActiveXObject("Msxml2.XMLHTTP");
 			        } catch(e) {
-			            // try an older version
 			            try{
 			            	req = new ActiveXObject("Microsoft.XMLHTTP");
 			            } catch(e) {
@@ -473,74 +471,38 @@ ob_end_clean();
 			    document.getElementById("prodmod_from").style.display="block";
 			    return req;
 			}
-
-			function yesnoCheck(that) {
-				document.getElementById("emg").style.display = "none";
-				document.getElementById("telf").style.display = "none";
-				document.getElementById("sum").style.display = "none";
-			}
-			function yesnoCheck2(that) {
-				document.getElementById("emg").style.display = "block" 
-				document.getElementById("telf").style.display = "block";
-				document.getElementById("sum").style.display = "block";
-			}
 		</script>
 
 		<script type="text/javascript">
-			$(document).ready(function() {
-				$('.form-validation').parsley();
-				$('.summernote').summernote({
-					height: 350,                 
-					minHeight: null,            
-					maxHeight: null,             
-					focus: false                 
-				});
-			});
-			$(document).ready(function() {
-				$('#summernote').summernote({
-					height: "170px"
-				});
-			});
-			var postForm = function() {
-				var content = $('textarea[name="content"]').html($('#summernote').code());
-			}
-
-
 		function getOutput2(id,talla) {
 			getRequest2(
-		      'lib/searchsize.php?id_tipo='+id+'&talla='+talla, // URL for the PHP file
-		       drawOutput2,  // handle successful request
+		      'lib/searchsize.php?id_tipo='+id+'&talla='+talla, 
+		       drawOutput2,  
 		       drawError,
-		       id  // handle error
+		       id  
 		       );
 			return false;
 		}  
 
-		// handles drawing an error message
+		
 		function updateSize(event) {
 			id=this.options[this.selectedIndex].value;
 			getOutput2(id);
 		    
 		}
 
-		// handles the response, adds the html
 		function drawOutput2(responseText) {
 			$("#prod_talla").html(responseText);
-
-			
 		}
 		// helper function for cross-browser request object
 		function getRequest2(url, success, error, tipo) {
 			var req = false;
 			try{
-		        // most browsers
 		        req = new XMLHttpRequest();
-		    } catch (e){
-		        // IE
+		    } catch (e){		        
 		        try{
 		        	req = new ActiveXObject("Msxml2.XMLHTTP");
 		        } catch(e) {
-		            // try an older version
 		            try{
 		            	req = new ActiveXObject("Microsoft.XMLHTTP");
 		            } catch(e) {
@@ -564,6 +526,7 @@ ob_end_clean();
 		</script>
 
 		<?php
+			//Muestra error
 			if(isset($_GET['id'])){
 				$exists=array_values(select("select codigo from producto where codigo='".$_GET['id']."'")[0])[0];
 				if($exists!="0"){

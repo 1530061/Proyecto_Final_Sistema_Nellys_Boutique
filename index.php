@@ -1,9 +1,29 @@
 <?php 
-	include ("lib/db.php");
-	include ("lib/login_lib.php");
+    include ("lib/db.php");               //Funciones encargada de la BD
+    include ("lib/misc.php");             //Funciones compartidas en todos los formularios
 
 	session_start();
+/////Funciones del formulario
 
+    //Funcion que verifica si existe un usuario sino imprime un error en pantalla
+    function exists_user($user, $pass){
+        if (!empty($user) && !empty($pass)) {
+            $verification=select("select id from usuario where user='".$user."' and pass='".$pass."' and activo=1;");
+            if(array_values($verification[0])[0]!="0"){
+                session_start();
+                $_SESSION["logg"] = "true";
+                $_SESSION["id"] = array_values($verification[0])[0];
+                header('Location: /final/dashboard.php');
+            }
+            else{
+                sweetalert("El usuaro o la contraseña ingresada son incorrectos","bad");
+                echo("<br>");
+            }
+        }
+    }
+
+
+    //Se revisa que la conexion tenga una sesion activa sino se redirige al index.php
 	if (!empty($_SESSION["logg"]))
 	header('Location: /final/dashboard.php');
 ?>
@@ -33,10 +53,6 @@
 
 
     <body>
-    	<?php
-    		if(!empty($_POST['usr'])&&!empty($_POST['password']))
-    			exists_user($_POST['usr'], $_POST['password']);
-		?>
         <!-- HOME -->
         <section>
             <div class="container">
@@ -70,7 +86,10 @@
                                                 <input class="form-control" type="password" required="" id="password" name="password" placeholder="" maxlength="50">
                                             </div>
                                         </div>
-
+								    	<?php
+								    		if(!empty($_POST['usr'])&&!empty($_POST['password']))
+								    			exists_user($_POST['usr'], $_POST['password']);
+										?>
 
                                         <div class="form-group account-btn text-center m-t-10">
                                             <div class="col-xs-12">  
@@ -79,6 +98,7 @@
                                         </div>
 
                                     </form>
+                                    
                                 </div>
 
                             <div class="clearfix">
@@ -99,14 +119,6 @@
 
         </section>
         <!-- END HOME -->
-
-        <script>
-          document.addEventListener( 'keydown', function( event ) {
-            var caps = event.getModifierState && event.getModifierState( 'CapsLock' );
-            console.log( caps ); // true when you press the keyboard CapsLock key
-          });
-        </script>
-
 
         <!-- js placed at the end of the document so the pages load faster -->
         <script src="assets/js/jquery-2.1.4.min.js"></script>

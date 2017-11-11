@@ -1,15 +1,15 @@
 <?php 
 session_start();
-include ("lib/db.php");
-include ("lib/misc.php");
-include ("lib/user_control_lib.php");
+include ("lib/db.php");               //Funciones encargada de la BD
+include ("lib/misc.php");             //Funciones compartidas en todos los formularios
+include ("lib/user_control_lib.php"); //Funciones compartidas entre la seccion de control de usuarios
 
 if (empty($_SESSION["logg"]))
 	header('Location: /final/index.php');
 ?>
 
 
-<?php // here start your php file
+<?php
 ob_get_contents();
 ob_end_clean();
 ?>
@@ -91,38 +91,30 @@ ob_end_clean();
 
 			<!-- START PAGE CONTENT -->
 			<div id="page-right-content">
-				<!-- Logo and name -->
-				<div class="row" style="height:70px;">
-					<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-						<span class="mdi mdi-account-plus" style="font-size: 60px; padding-left: 10px;" ></span> 
-					</div>
-					<div class="col-sm-11 col-md-8 col-lg-11">
-						<h1 style="color:#D52B2B;"> Agregar Usuario </h1>
-					</div>
-					<hr>
+				<!-- Logo and name -->	
+				<div class="col-sm-12 col-md-12 col-lg-12">
+					<h1 style="color:#D52B2B;"><span class="mdi mdi-account-plus" style="font-size: 60px; padding-left: 10px;" ></span>    Agregar Usuario </h1>
+
+					<?php
+					if($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) &&
+						empty($_FILES) && $_SERVER['CONTENT_LENGTH'] > 0)
+					{
+						echo('<div class="alert alert-danger alert-dismissible fade in" role="alert">
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">×</span>
+							</button>
+							<strong> La imagen excede el tamaño permitido (>8MB)
+							</div>');
+					}
+					if(isset($_POST["usr_nombre"])){
+
+						$file=$_FILES['userfile']['name'];
+						$tmp=$_FILES['userfile']['tmp_name'];
+
+						insert_user($file, $tmp);
+					}
+					?>
 				</div>
-				
-
-				
-				<?php
-				if($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) &&
-					empty($_FILES) && $_SERVER['CONTENT_LENGTH'] > 0)
-				{
-					echo('<div class="alert alert-danger alert-dismissible fade in" role="alert">
-						<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-						<span aria-hidden="true">×</span>
-						</button>
-						<strong> La imagen excede el tamaño permitido (>8MB)
-						</div>');
-				}
-				if(isset($_POST["usr_nombre"])){
-
-					$file=$_FILES['userfile']['name'];
-					$tmp=$_FILES['userfile']['tmp_name'];
-
-					insert_user($file, $tmp);
-				}
-				?>
 				<div class="p-20 m-b-20">
 					<form enctype="multipart/form-data" action="user_new.php" id="testx" name="test" class="form-validation" novalidate="" method="post">
 
@@ -250,16 +242,11 @@ ob_end_clean();
 	<script src="assets/js/metisMenu.min.js"></script>
 	<script src="assets/js/jquery.slimscroll.min.js"></script>
 
-	<!--Morris Chart-->
-	<script src="assets/plugins/morris/morris.min.js"></script>
-	<script src="assets/plugins/raphael/raphael-min.js"></script>
 
 	<!-- SweetAlert-->
 	<script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
 	<script src="assets/pages/jquery.sweet-alert.init.js"></script>
 
-	<!-- Dashboard init -->
-	<script src="assets/pages/jquery.dashboard.js"></script>
 
 	<!-- App Js -->
 	<script src="assets/js/jquery.app.js"></script>
@@ -294,6 +281,7 @@ ob_end_clean();
 	<script src="assets/js/jquery.app.js"></script>
 
 	<script type="text/javascript">
+		//Previsualizacion de imagen
         function readURL(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
@@ -308,6 +296,7 @@ ob_end_clean();
     </script>
 	
 	<script>
+		//Radiobuttons para administrador y usuario
 		function yesnoCheck(that) {
 			document.getElementById("emg").style.display = "none";
 			document.getElementById("telf").style.display = "none";
@@ -318,6 +307,7 @@ ob_end_clean();
 			document.getElementById("telf").style.display = "block";
 			document.getElementById("summer").style.display = "block";
 		}
+		//Ir al comienzo de la pagina
 		function gotop(){
 		    $('html, body').animate({
 		        scrollTop: $("#page-right-content").offset().top
@@ -326,13 +316,14 @@ ob_end_clean();
 	</script>
 	
 	<script type="text/javascript">
+		//Dibujando el elemento summernote
 		$(document).ready(function() {
 			$('.form-validation').parsley();
 			$('.summernote').summernote({
-                    height: 350,                 // set editor height
-                    minHeight: null,             // set minimum height of editor
-                    maxHeight: null,             // set maximum height of editor
-                    focus: false                 // set focus to editable area after initializing summernote
+                    height: 350,                 
+                    minHeight: null,             
+                    maxHeight: null,             
+                    focus: false                 
                 });
 		});
 		$(document).ready(function() {

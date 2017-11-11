@@ -1,15 +1,63 @@
 <?php 
 session_start();
-include ("lib/db.php");
-include ("lib/misc.php");
-include ("lib/stock_lib.php");
+include ("lib/db.php");               //Funciones encargada de la BD
+include ("lib/misc.php");             //Funciones compartidas en todos los formularios
+include ("lib/stock_lib.php");		  //Contiene funciones de llenado de las tablas de busqueda
 
+////Funciones del formulario
+	//Llena la tabla de la busqueda
+	function fill_datatable_prod_del_upd(){
+		echo('
+		 <thead>
+	        <tr>
+	            <th>Codigo</th>
+	            <th>Nombre</th>
+	          	<th>Tipo</th>
+	          	<th>Talla</th>
+	          	<th>Cantidad Stock</th>
+	          	<th>Precio</th>
+	          	<th>Actualizar</th>
+	          	<th>Eliminar</th>
+				<th>Surtir</th>
+	
+	        </tr>
+	    </thead>
+	    <tbody>
+	    ');
+
+		$table = select("select p.codigo, p.nombre as ne, tp.nombre, t.talla, p.cantidad_stock, p.precio from producto p inner join tipo_producto tp on tp.id = p.id_tipo inner join talla t on p.id_talla=t.id where activo=1");
+
+	
+	    for($i=0;$i<sizeof($table);$i++){
+	    	$pattern = '/\s*/m';
+   			$replace = '';
+    		$id=array_values($table[$i])[0];
+			$id=preg_replace( $pattern, $replace,$id );
+			echo('
+				<tr>
+					<td>'.array_values($table[$i])[0].'</td>
+					<td>'.array_values($table[$i])[1].'</td>
+					<td>'.array_values($table[$i])[2].'</td>
+					<td>'.array_values($table[$i])[3].'</td>
+					<td>'.array_values($table[$i])[4].'</td>
+					<td>'.array_values($table[$i])[5].'</td>
+					<td><center><button class="btn btn-icon btn-warning" onclick="open_del(\''.$id.'\')"> <i class="fa fa-wrench"></i> </button></center></td>
+					<td><center><button class="btn btn-icon btn-danger" onclick="open_mod(\''.$id.'\')"> <i class="fa fa-remove"></i> </button></center></td>
+					<td><center><button class="btn btn-icon btn-success" onclick="open_supp(\''.$id.'\')"> <i class="mdi mdi-plus-circle-outline"></i> </button></center></td>
+				</tr>
+				');
+		}
+	    echo('</tbody>');	
+	}
+
+
+//Se revisa que la conexion tenga una sesion activa sino se redirige al index.php
 if (empty($_SESSION["logg"]))
 	header('Location: /final/index.php');
 ?>
 
 
-<?php // here start your php file
+<?php 
 ob_get_contents();
 ob_end_clean();
 ?>
@@ -18,7 +66,7 @@ ob_end_clean();
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>Eliminar Usuario</title>
+	<title>Inventario</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
 	<meta content="Coderthemes" name="author" />
@@ -105,16 +153,10 @@ ob_end_clean();
 			<!-- START PAGE CONTENT -->
 			<div id="page-right-content">
 				<!-- Logo and name -->
-				<div class="row" style="height:70px;">
-					<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-						<span class="mdi mdi-autorenew" style="font-size: 60px; padding-left: 10px;" ></span> 
-					</div>
-					<div class="col-sm-11 col-md-8 col-lg-11">
-						<h1 style="color:#D52B2B;"> Modificar Producto </h1>
-					</div>
-
-				</div>
-
+			
+ 				<div class="col-sm-12 col-md-12 col-lg-12">
+                    <h1 style="color:#D52B2B;"><span class="mdi mdi-store gi-5x" style="font-size: 60px; padding-left: 10px;" ></span>  Inventario</h1>
+                </div>
 
 
 
@@ -253,16 +295,6 @@ ob_end_clean();
 	<script src="assets/js/metisMenu.min.js"></script>
 	<script src="assets/js/jquery.slimscroll.min.js"></script>
 
-	<!--Morris Chart-->
-	<script src="assets/plugins/morris/morris.min.js"></script>
-	<script src="assets/plugins/raphael/raphael-min.js"></script>
-
-	<!-- SweetAlert-->
-	<script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
-	<script src="assets/pages/jquery.sweet-alert.init.js"></script>
-
-	<!-- Dashboard init -->
-	<script src="assets/pages/jquery.dashboard.js"></script>
 
 	<!-- App Js -->
 	<script src="assets/js/jquery.app.js"></script>
@@ -271,25 +303,14 @@ ob_end_clean();
 	<script src="lib/fun.js"></script>
 
 
-	<!--filestyle -->
-	<script src="assets/plugins/bootstrap-filestyle/js/bootstrap-filestyle.min.js" type="text/javascript"></script>
-
 	<script src="assets/plugins/bootstrap-tagsinput/js/bootstrap-tagsinput.min.js"></script>
 	<script src="assets/plugins/select2/js/select2.min.js" type="text/javascript"></script>
 	<script src="assets/plugins/bootstrap-filestyle/js/bootstrap-filestyle.min.js" type="text/javascript"></script>
 	<script src="assets/plugins/switchery/switchery.min.js"></script>
 	<script type="text/javascript" src="assets/plugins/parsleyjs/parsley.min.js"></script>
 
-	<script src="assets/plugins/moment/moment.js"></script>
-	<script src="assets/plugins/timepicker/bootstrap-timepicker.js"></script>
-	<script src="assets/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
-	<script src="assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
-	<script src="assets/plugins/clockpicker/js/bootstrap-clockpicker.min.js"></script>
-	<script src="assets/plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
-	<script src="assets/plugins/summernote/summernote.min.js"></script>
 
-	<!-- form advanced init js -->
-	<script src="assets/pages/jquery.form-advanced.init.js"></script>
+
 
 	<!-- Datatable js -->
 	<script src="assets/plugins/datatables/jquery.dataTables.min.js"></script>
@@ -309,28 +330,10 @@ ob_end_clean();
 	<script src="assets/plugins/datatables/dataTables.fixedColumns.min.js"></script>
 
 
-    <!-- Sweet-Alert  -->
-    <script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
-    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
 
 
 	<!-- App Js -->
 	<script src="assets/js/jquery.app.js"></script>
-
-	<script type="text/javascript">
-        function readURL(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-
-                reader.onload = function (e) {
-                    $('#prev_foto').attr('src', e.target.result);
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-    </script>
-
 
 	<script>
 			function open_del(id) {
@@ -361,6 +364,7 @@ ob_end_clean();
 					getOutput("'"+value+"'", $i);
 			})
 
+			//Creacion de la tabla de los botones
 			$(document).ready(function() {
 			    $('#exampletable').DataTable({
 				    "drawCallback": function( settings ) {
@@ -368,179 +372,6 @@ ob_end_clean();
 				    }
 				});
 			});
-
-			var elem = ["prod_name","prod_desc","prod_tipo","prod_talla","prod_precio", "prod_cant", "fotografia"];
-			function callFromTable(value){
-				document.getElementById('prod_cod').value= value;
-				document.getElementById("tabla_div").style.display = "none";
-				//document.getElementById('contain_form').scrollIntoView();
-			    $('html, body').animate({
-			        scrollTop: $("#contain_form").offset().top
-			    }, 500);
-				for($i=0;$i<elem.length;$i++){
-					getOutput("'"+value+"'", $i);
-				}
-			}
-
-			// handles the click event for link 1, sends the query
-			function getOutput(id,tipo) {
-				getRequest(
-			      'lib/searchbycode_products.php?id="'+id+'"&t='+tipo, // URL for the PHP file
-			       drawOutput,  // handle successful request
-			       drawError,
-			       tipo  // handle error
-			       );
-				return false;
-			}  
-
-			// handles drawing an error message
-			function drawError() {
-				var container = document.getElementById('output');
-				container.innerHTML = 'Bummer: there was an error!';
-			}
-			
-			var responsePrevTipo;
-			// handles the response, adds the html
-			function drawOutput(responseText, tipo) {
-				//RADIOBUTTON GENERO
-				elem_id=elem[tipo];
-				if(tipo==2){
-					document.getElementById(elem_id).value= responseText;
-					//getOutput2(responseText);
-					responsePrevTipo=responseText;
-				}else if(tipo==3){
-					console.log(responseText);
-					getOutput2(responsePrevTipo, responseText);
-					//document.getElementById(elem_id).value=responseText;
-				}else if(tipo==6){
-					document.getElementById(elem_id).src= responseText;
-				}else{
-					document.getElementById(elem_id).value= responseText;
-				}
-				
-			}
-			// helper function for cross-browser request object
-			function getRequest(url, success, error, tipo) {
-				var req = false;
-				try{
-			        // most browsers
-			        req = new XMLHttpRequest();
-			    } catch (e){
-			        // IE
-			        try{
-			        	req = new ActiveXObject("Msxml2.XMLHTTP");
-			        } catch(e) {
-			            // try an older version
-			            try{
-			            	req = new ActiveXObject("Microsoft.XMLHTTP");
-			            } catch(e) {
-			            	return false;
-			            }
-			        }
-			    }
-			    if (!req) return false;
-			    if (typeof success != 'function') success = function () {};
-			    if (typeof error!= 'function') error = function () {};
-			    req.onreadystatechange = function(){
-			    	if(req.readyState == 4) {
-			    		return req.status === 200 ? 
-			    		success(req.responseText, tipo) : error(req.status);
-			    	}
-			    }
-			    req.open("GET", url, true);
-			    req.send(null);
-			    document.getElementById("prodmod_from").style.display="block";
-			    return req;
-			}
-
-			function yesnoCheck(that) {
-				document.getElementById("emg").style.display = "none";
-				document.getElementById("telf").style.display = "none";
-				document.getElementById("sum").style.display = "none";
-			}
-			function yesnoCheck2(that) {
-				document.getElementById("emg").style.display = "block" 
-				document.getElementById("telf").style.display = "block";
-				document.getElementById("sum").style.display = "block";
-			}
 		</script>
-
-		<script type="text/javascript">
-			$(document).ready(function() {
-				$('.form-validation').parsley();
-				$('.summernote').summernote({
-					height: 350,                 
-					minHeight: null,            
-					maxHeight: null,             
-					focus: false                 
-				});
-			});
-			$(document).ready(function() {
-				$('#summernote').summernote({
-					height: "170px"
-				});
-			});
-			var postForm = function() {
-				var content = $('textarea[name="content"]').html($('#summernote').code());
-			}
-
-
-		function getOutput2(id,talla) {
-			getRequest2(
-		      'lib/searchsize.php?id_tipo='+id+'&talla='+talla, // URL for the PHP file
-		       drawOutput2,  // handle successful request
-		       drawError,
-		       id  // handle error
-		       );
-			return false;
-		}  
-
-		// handles drawing an error message
-		function updateSize(event) {
-			id=this.options[this.selectedIndex].value;
-			getOutput2(id);
-		    
-		}
-
-		// handles the response, adds the html
-		function drawOutput2(responseText) {
-			$("#prod_talla").html(responseText);
-
-			
-		}
-		// helper function for cross-browser request object
-		function getRequest2(url, success, error, tipo) {
-			var req = false;
-			try{
-		        // most browsers
-		        req = new XMLHttpRequest();
-		    } catch (e){
-		        // IE
-		        try{
-		        	req = new ActiveXObject("Msxml2.XMLHTTP");
-		        } catch(e) {
-		            // try an older version
-		            try{
-		            	req = new ActiveXObject("Microsoft.XMLHTTP");
-		            } catch(e) {
-		            	return false;
-		            }
-		        }
-		    }
-		    if (!req) return false;
-		    if (typeof success != 'function') success = function () {};
-		    if (typeof error!= 'function') error = function () {};
-		    req.onreadystatechange = function(){
-		    	if(req.readyState == 4) {
-		    		return req.status === 200 ? 
-		    		success(req.responseText) : error(req.status);
-		    	}
-		    }
-		    req.open("GET", url, true);
-		    req.send(null);
-		    return req;
-		}
-		</script>
-
 	</body>
 	</html>

@@ -1,8 +1,23 @@
 <?php 
   session_start();
-  include ("lib/db.php");
-  include ("lib/misc.php");
+  include ("lib/db.php");               //Funciones encargada de la BD
+  include ("lib/misc.php");             //Funciones compartidas en todos los formularios
 
+//// Funciones del formulario
+    function change_motd(){
+    $dateTime = new DateTime('now'); 
+    $dateTime=date_format($dateTime,"Y-m-d H:i:s");
+    if(!empty($_POST["content"])){
+      $columns=["mensaje", "id_usuario", "fecha"];
+      $values=[st($_POST["content"]), $_SESSION["id"], st($dateTime)];
+      insert($columns, $values, "motd");
+    }else{
+      sweetalert("No puede dejar el mensaje del dia vacio.","bad");
+    }
+  }
+
+
+  //Se revisa que la conexion tenga una sesion activa sino se redirige al index.php
   if (empty($_SESSION["logg"]))
     header('Location: /final/index.php');
 ?>
@@ -10,7 +25,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>SimpleAdmin - Responsive Admin Dashboard Template</title>
+        <title>Mensaje del Dia</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
         <meta content="Coderthemes" name="author" />
@@ -85,10 +100,10 @@
                   <!-- Logo and name -->
                   <div class="row">
                     <div class="col-sm-1 col-md-4 col-lg-1">
-                      <span class="ti-home gi-5x" style="font-size: 60px; padding-left: 10px;" ></span> 
+                      <span class="mdi mdi-mail-ru gi-5x" style="font-size: 60px; padding-left: 10px;" ></span> 
                     </div>
                     <div class="col-sm-11 col-md-8 col-lg-11">
-                      <h1> Tablero </h1>
+                      <h1> Configuracion del Mensaje del Dia </h1>
                     </div>
                   </div>
                   <?php
@@ -202,6 +217,7 @@
 
 
       <script type="text/javascript">
+           //Dibujado de elemento SummerNote
             $(document).ready(function() {
                 $('.form-validation').parsley();
                 $('.summernote').summernote({

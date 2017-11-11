@@ -1,15 +1,48 @@
 <?php 
 session_start();
-include ("lib/db.php");
-include ("lib/misc.php");
-include ("lib/corte_lib.php");
+include ("lib/db.php");               //Funcion encargada de la BD
+include ("lib/misc.php");             //Funciones compartidas en todos los formularios
 
+/////Funciones del formulario
+
+	//Funcion que llena la tabla del formulario donde se almacenan los registros que se encontraran en el corte de caja.
+	function fill_datatable_corte(){
+		echo('
+		 <thead>
+	        <tr>
+	            <th>Id de la Venta</th>
+	            <th>Total de Venta</th>
+	            <th>Vendedor</th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	    ');
+		$daten=date_create("now");
+		$daten=date_format($daten,"Y-m-d");
+
+		$today = select("select id, total,id_usuario from venta where fecha='".$daten."'");
+		
+		for($i=0;$i<sizeof($today);$i++){
+			echo('
+				<tr>
+					<td>'.array_values($today[$i])[0].'</td>
+					<td>'.array_values($today[$i])[1].'</td>
+					<td>'.array_values(select("select CONCAT(nombre, apellido_paterno, apellido_materno) from usuario where id='".array_values($today[$i])[2]."'")[0])[0].'</td>
+				</tr>
+				');
+		}
+	    echo('</tbody>');	
+	}
+
+
+
+//Se revisa que la conexion tenga una sesion activa sino se redirige al index.php
 if (empty($_SESSION["logg"]))
 	header('Location: /final/index.php');
 ?>
 
 
-<?php // here start your php file
+<?php 
 ob_get_contents();
 ob_end_clean();
 ?>
@@ -19,10 +52,10 @@ ob_end_clean();
 <head>
 	<meta charset="utf-8" />
 	<?php
-		$daten=date_create("now");
-		$daten=date_format($daten,"Y-m-d");
+	$daten=date_create("now");
+	$daten=date_format($daten,"Y-m-d");
 
-		echo("<title id='title'>Corte de caja [".$daten."]</title>");
+	echo("<title id='title'>Corte de caja [".$daten."]</title>");
 	?>
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -32,30 +65,20 @@ ob_end_clean();
 
 	<link rel="shortcut icon" href="assets/images/favicon.ico">
 
-    <!-- Sweet Alert -->
-    <link href="assets/plugins/sweet-alert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
-
-	<!--Morris Chart CSS -->
-	<link rel="stylesheet" href="assets/plugins/morris/morris.css">
 
 	<!-- Plugins css-->
 	<link href="assets/plugins/bootstrap-tagsinput/css/bootstrap-tagsinput.css" rel="stylesheet" />
 	<link rel="stylesheet" href="assets/plugins/switchery/switchery.min.css">
-	<link href="assets/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 	<link href="assets/plugins/timepicker/bootstrap-timepicker.min.css" rel="stylesheet">
-	<link href="assets/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css" rel="stylesheet">
-	<link href="assets/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
-	<link href="assets/plugins/clockpicker/css/bootstrap-clockpicker.min.css" rel="stylesheet">
-	<link href="assets/plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
 
 	<!-- DataTables -->
-    <link href="assets/plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css"/>
-    <link href="assets/plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css"/>
-    <link href="assets/plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css"/>
-    <link href="assets/plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css"/>
-    <link href="assets/plugins/datatables/dataTables.colVis.css" rel="stylesheet" type="text/css"/>
-    <link href="assets/plugins/datatables/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css"/>
-    <link href="assets/plugins/datatables/fixedColumns.dataTables.min.css" rel="stylesheet" type="text/css"/>
+	<link href="assets/plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css"/>
+	<link href="assets/plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css"/>
+	<link href="assets/plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css"/>
+	<link href="assets/plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css"/>
+	<link href="assets/plugins/datatables/dataTables.colVis.css" rel="stylesheet" type="text/css"/>
+	<link href="assets/plugins/datatables/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css"/>
+	<link href="assets/plugins/datatables/fixedColumns.dataTables.min.css" rel="stylesheet" type="text/css"/>
 
 
 	<!-- Bootstrap core CSS -->
@@ -68,9 +91,13 @@ ob_end_clean();
 	<link href="assets/css/style.css" rel="stylesheet">
 	<link href="assets/plugins/summernote/summernote.css" rel="stylesheet" />
 
-
-
-
+	<script type="text/javascript">
+		var titleStart=document.getElementById("title").innerHTML;
+		//Se dibuja un timepicker
+		function hour() {
+			document.getElementById("title").innerHTML=titleStart+" "+document.getElementById("timepicker").value;
+		}
+	</script>
 </head>
 
 
@@ -111,23 +138,18 @@ ob_end_clean();
 			<!-- START PAGE CONTENT -->
 			<div id="page-right-content">
 				<!-- Logo and name -->
-				<div class="row" style="height:70px;">
-					<div style="color:#D52B2B;" class="col-sm-1 col-md-4 col-lg-1">
-						<span class="mdi mdi-autorenew" style="font-size: 60px; padding-left: 10px;" ></span> 
-					</div>
-					<div class="col-sm-11 col-md-8 col-lg-11">
-						<h1 style="color:#D52B2B;"> Corte de caja del dia</h1>
-					</div>
-
+				<div class="col-sm-12 col-md-12 col-lg-12">
+					<h1 style="color:#D52B2B;"><span class="mdi mdi-autorenew" style="font-size: 60px; padding-left: 10px;" ></span>   Corte de caja del dia</h1>
 				</div>
+
 
 				<div class="row" style="width:100%; padding-left: 30px;">
 					<h5 > <i class="mdi mdi-information-outline"></i> Obtenga un documento en formato PDF, CSV, EXCEL o copie al portapapeles un reporte generado con los valores de la tabla, haciendo click en los botones que se encuentran en la parte superior de la tabl y modifique la hora que quiere que aparezca en el titulo.</h5>
 					<label for="timepicker">Hora a mostrar en el documento<span class="text-danger"></span></label>
 					<div class="input-group">
-	                    <input onchange=(hour()) id="timepicker" name="timepicker" type="text" class="form-control">
-	                    <span class="input-group-addon"><i class="mdi mdi-clock"></i></span>
-                	</div>
+						<input onchange=(hour()) id="timepicker" name="timepicker" type="text" class="form-control">
+						<span class="input-group-addon"><i class="mdi mdi-clock"></i></span>
+					</div>
 				</div>
 
 				
@@ -136,10 +158,10 @@ ob_end_clean();
 						
 						<div id="table_cont">
 							<table id="exampletable" class="table table-striped table-bordered dataTable no-footer dtr-inline" cellspacing="0" width="100%">
-						    	<?php
-						    		fill_datatable_corte();
-						    	?>
-						    </table>
+								<?php
+								fill_datatable_corte();
+								?>
+							</table>
 						</div>
 					</div>
 
@@ -163,46 +185,12 @@ ob_end_clean();
 
 
 	<!-- js placed at the end of the document so the pages load faster -->
-
 	<script src="assets/js/jquery-2.1.4.min.js"></script>
-	<script src="assets/js/bootstrap.min.js"></script>
-	<script src="assets/js/metisMenu.min.js"></script>
-	<script src="assets/js/jquery.slimscroll.min.js"></script>
 
-	<!--Morris Chart-->
-	<script src="assets/plugins/morris/morris.min.js"></script>
-	<script src="assets/plugins/raphael/raphael-min.js"></script>
-
-	<!-- SweetAlert-->
-	<script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
-	<script src="assets/pages/jquery.sweet-alert.init.js"></script>
-
-	<!-- Dashboard init -->
-	<script src="assets/pages/jquery.dashboard.js"></script>
-
-	<!-- App Js -->
-	<script src="assets/js/jquery.app.js"></script>
-
-	<!-- fun-->
-	<script src="lib/fun.js"></script>
-
-
-	<!--filestyle -->
-	<script src="assets/plugins/bootstrap-filestyle/js/bootstrap-filestyle.min.js" type="text/javascript"></script>
 
 	<script src="assets/plugins/bootstrap-tagsinput/js/bootstrap-tagsinput.min.js"></script>
 	<script src="assets/plugins/select2/js/select2.min.js" type="text/javascript"></script>
-	<script src="assets/plugins/bootstrap-filestyle/js/bootstrap-filestyle.min.js" type="text/javascript"></script>
-	<script src="assets/plugins/switchery/switchery.min.js"></script>
-	<script type="text/javascript" src="assets/plugins/parsleyjs/parsley.min.js"></script>
-
-	<script src="assets/plugins/moment/moment.js"></script>
 	<script src="assets/plugins/timepicker/bootstrap-timepicker.js"></script>
-	<script src="assets/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
-	<script src="assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
-	<script src="assets/plugins/clockpicker/js/bootstrap-clockpicker.min.js"></script>
-	<script src="assets/plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
-	<script src="assets/plugins/summernote/summernote.min.js"></script>
 
 	<!-- form advanced init js -->
 	<script src="assets/pages/jquery.form-advanced.init.js"></script>
@@ -217,70 +205,41 @@ ob_end_clean();
 	<script src="assets/plugins/datatables/vfs_fonts.js"></script>
 	<script src="assets/plugins/datatables/buttons.html5.min.js"></script>
 	<script src="assets/plugins/datatables/buttons.print.min.js"></script>
-	<script src="assets/plugins/datatables/dataTables.keyTable.min.js"></script>
-	<script src="assets/plugins/datatables/dataTables.responsive.min.js"></script>
-	<script src="assets/plugins/datatables/responsive.bootstrap.min.js"></script>
-	<script src="assets/plugins/datatables/dataTables.scroller.min.js"></script>
-	<script src="assets/plugins/datatables/dataTables.colVis.js"></script>
-	<script src="assets/plugins/datatables/dataTables.fixedColumns.min.js"></script>
-
-
-    <!-- Sweet-Alert  -->
-    <script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
-    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
-
-
-	<!-- App Js -->
-	<script src="assets/js/jquery.app.js"></script>
+    <!-- Logout-->
+    <script src="lib/fun.js"></script>
 
 	<script type="text/javascript">
-		var titleStart=document.getElementById("title").innerHTML;
-        function hour() {
-           	document.getElementById("title").innerHTML=titleStart+" "+document.getElementById("timepicker").value;
-        }
-    </script>
+		//Funcion que llena un img div con la imagen que se tiene cargada a la pagina, antes de almacenarla.
+		function readURL(input) {
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
 
-	<script type="text/javascript">
-        function readURL(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
+				reader.onload = function (e) {
+					$('#prev_foto').attr('src', e.target.result);
+				}
 
-                reader.onload = function (e) {
-                    $('#prev_foto').attr('src', e.target.result);
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-    </script>
-
+				reader.readAsDataURL(input.files[0]);
+			}
+		}
+	</script>
 
 	<script>
-			function open_del(id) {
-				window.open('stock_mod.php?id='+id,'_self');
-			}
-			function open_mod(id){
-				window.open('stock_del.php?id='+id,'_self');
-			}
-			
-			function open_supp(id){
-				window.open('stock_supply.php?id='+id,'_self');
-			}
-
-			$(document).ready(function() {
-			    $('#exampletable').DataTable( {
-			        dom: 'Bfrtip',
-			        buttons: [
-			            'copyHtml5',
-			            'excelHtml5',
-			            'csvHtml5',
-			            'pdfHtml5'
-			        ]
-			    } );
+		//Invoca la tabla que permite realizar los reportes en los formatos EXCEL, CSV Y PDF.
+		$(document).ready(function() {
+			$('#exampletable').DataTable( {
+				dom: 'Bfrtip',
+				buttons: [
+				'copyHtml5',
+				'excelHtml5',
+				'csvHtml5',
+				'pdfHtml5'
+				]
 			} );
-						
+		} );
 
-		</script>
 
-	</body>
-	</html>
+	</script>
+
+
+</body>
+</html>
