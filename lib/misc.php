@@ -203,6 +203,8 @@ function page_print_leftsidemenu(){
 
 		<li><a href="stock.php"><span class="label label-custom pull-right"></span> <i class="mdi mdi-package-variant-closed"></i> Inventario </a></li>
 
+		<li><a href="corte.php"><span class="label label-custom pull-right"></span> <i class="mdi mdi-package-variant-closed"></i> Corte de caja</a></li>
+
 		<li><a href="stock_supply.php"><span class="label label-custom pull-right"></span> <i class="mdi mdi-package-variant-closed"></i> Surtir Producto </a></li>
 		
 		<li class="">

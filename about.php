@@ -87,7 +87,8 @@
                     <div id="map" style="height:500px; width:100%;">
                     </div>
 
-                    <h5>v1.0</h5>
+                    <h5>v1.0 - Erick Elizondo Rodríguez - 1530061</h5>
+                    <h5>Diseño de Interfaces</h5>
                   </div>
 
                   <!-- end container -->

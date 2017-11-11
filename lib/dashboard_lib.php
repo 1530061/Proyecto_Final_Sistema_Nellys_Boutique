@@ -41,4 +41,26 @@
 		}       
 	}
 
+	function activeAndInactive(){
+		$admin = array_values(select("select count(*) from usuario where activo=0")[0])[0];
+		$user = array_values(select("select count(*) from usuario where activo=1")[0])[0];
+		echo('{label: "Activos", value: '.$admin.'},
+              {label: "Inactivos", value: '.$user.'},');
+	}
+
+	function prod_activeAndInactive(){
+		$activo = array_values(select("select count(*) from producto where activo=0")[0])[0];
+		$inactivo = array_values(select("select count(*) from producto where activo=1")[0])[0];
+		echo('{label: "Activos", value: '.$activo.'},
+              {label: "Inactivos", value: '.$inactivo.'},');
+	}
+
+	function getDateGraph(){
+		$lista=select('select fecha, SUM(total), count(*) from venta group by fecha limit 10');
+
+		for($i=0;$i<sizeof($lista);$i++){
+		 	echo('{week:"'.array_values($lista[$i])[0].'", "venta":"'.array_values($lista[$i])[1].'",  "precio":'.array_values($lista[$i])[1].'},');
+		 }
+	}
+
 ?>

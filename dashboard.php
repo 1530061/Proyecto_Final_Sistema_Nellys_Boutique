@@ -88,14 +88,7 @@
                 <!-- START PAGE CONTENT -->
                 <div id="page-right-content">
                   <!-- Logo and name -->
-                  <div class="row">
-                    <div class="col-sm-1 col-md-4 col-lg-1">
-                      <span class="ti-home gi-5x" style="font-size: 60px; padding-left: 10px;" ></span> 
-                    </div>
-                    <div class="col-sm-11 col-md-8 col-lg-11">
-                      <h1> Tablero </h1>
-                    </div>
-                  </div>
+                 
 
                   <div class="card-box widget-inline" style=" width: 99%; height: 150px; overflow: hidden;">
                       <div class="row" style="width:90%; ">
@@ -153,25 +146,64 @@
 
                     </div>
                   </div>
+                  <h4 style="padding-left: 20px;"> Distribucion de usuarios </h4>
                   <div id="grafica_cantidad_top_productos" style="height: 250px;"></div>
                   <div class="row">
-                     <div class="col-lg-3 col-sm-3">
-                          <div id="otro" style="height: 250px;"></div>
+                          <div style="padding-left:40px" class="col-lg-6 col-sm-6">
+                            <h4> Distribucion de usuarios </h4>
+                          </div>
+                          <div style="padding-left:40px" class="col-lg-6 col-sm-6">
+                            <h4> Productos mas caros<h4>
+                          </div>
                      </div>
-                      <div class="col-lg-3 col-sm-3">
-                          <div id="usuarios_y_administradores" style="height: 250px;"></div>
-                      </div>
-                      <div class="col-lg-6 col-sm-6">
-                          <div id="productos_mas_caros" style="height: 250px;"></div>
-                      </div>
+                  <div class="row">
+                     
+                      <div class="row">
+                        <br><br>
+                         
+                         <div class="col-lg-3 col-sm-3">
+                          <br><br>
+                              <div id="usuarios_activosEInactivos" style="height: 250px;"></div>
+                         </div>
+                          <div class="col-lg-3 col-sm-3">
+                            <br><br>
+                              <div id="usuarios_y_administradores" style="height: 250px;"></div>
+                          </div>
+                          <div class="col-lg-6 col-sm-6">
+                             <div style="padding-left:40px" class="col-lg-11 col-sm-11">
+                            
+                            </div>
+                              <div id="productos_mas_caros" style="height: 250px;"></div>
+                          </div>
+                    </div>
                   </div>
-                  <div id="tipos_producto" style="height: 250px;"></div>
-                  
+                  <br><br>
+                  <div class="row">
+                     <div class="row">
+                        
+                        <div class="col-lg-6 col-sm-6">
+                          <div style="padding-left:40px" class="col-lg-11 col-sm-11">
+                            <h4> Tipos de Producto mas Vendidos </h4>
+                          </div>
+                          <div id="tipos_producto" style="height: 250px;"></div>
+                        </div>
+                        <div class="col-lg-6 col-sm-6">
+                          <div style="padding-left:40px" class="col-lg-11 col-sm-11">
+                            <h4> Estado de productos </h4>
+                          </div>
+                          <div id="productos_activosEInactivos" style="height: 250px;"></div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    
                        
                   <!-- end container -->
-
-                  <div class="footer">
-  
+                  <div class="row">
+                    <div style="height: 150px";"></div>
+                  </div>
+                  <div class="footer" style="padding-top:100px;">
+                    
                       <div>
                           <strong>Sistema Nelly's Boutique</strong> - Copyright &copy; 2017
                       </div>
@@ -210,27 +242,22 @@
         <script src="lib/fun.js"></script>
 
         <script>
-          new Morris.Line({
-          // ID of the element in which to draw the chart.
-          element: 'grafica_cantidad_top_productos',
-          // Chart data records -- each entry in this array corresponds to a point on
-          // the chart.
-          data: [
-            { year: '2008', value: 20 },
-            { year: '2009', value: 10 },
-            { year: '2010', value: 5 },
-            { year: '2011', value: 5 },
-            { year: '2012', value: 20 }
-          ],
-          // The name of the data record attribute that contains x-values.
-          xkey: 'year',
-          // A list of names of data record attributes that contain y-values.
-          ykeys: ['value'],
-          // Labels for the ykeys -- will be displayed when you hover over the
-          // chart.
-          labels: ['Value']
+          Morris.Line({
+                element:'grafica_cantidad_top_productos',
+                data: [           
+                    <?php
+                      getDateGraph();
+                    ?>        
+                 ],
+                 xkey: 'week', 
+                 ykeys: ['venta'],
+                 labels: ['precio'],
+                 parseTime:false,
+                 hideHover:true,
+                 lineWidth:'6px',
+                 stacked: true           
+             
           });
-
           new Morris.Bar({
           // ID of the element in which to draw the chart.
           element: 'tipos_producto',
@@ -252,10 +279,20 @@
           });
 
            Morris.Donut({
-            element: 'otro',
+            element: 'productos_activosEInactivos',
             data: [
             <?php
-                getUserAdminChart();
+                prod_activeAndInactive();
+
+              ?>
+            ]
+          });
+
+           Morris.Donut({
+            element: 'usuarios_activosEInactivos',
+            data: [
+            <?php
+                activeAndInactive();
 
               ?>
             ]
