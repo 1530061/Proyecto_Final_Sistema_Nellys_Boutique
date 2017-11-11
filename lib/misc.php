@@ -206,6 +206,8 @@ function page_print_leftsidemenu(){
 		<li><a href="corte.php"><span class="label label-custom pull-right"></span> <i class="mdi mdi-package-variant-closed"></i> Corte de caja</a></li>
 
 		<li><a href="stock_supply.php"><span class="label label-custom pull-right"></span> <i class="mdi mdi-package-variant-closed"></i> Surtir Producto </a></li>
+
+		<li><a href="timelapse.php"><span class="label label-custom pull-right"></span> <i class="mdi mdi-package-variant-closed"></i> Linea de tiempo ventas </a></li>
 		
 		<li class="">
 			<a href="javascript: void(0);" aria-expanded="false"><i class="mdi mdi-package-variant-closed"></i> Gestion de Inventario <span class="fa arrow"></span></a>
@@ -231,7 +233,6 @@ function page_print_leftsidemenu(){
 		<a href="javascript: void(0);" aria-expanded="false"><i class="ti-menu-alt"></i> Administracion del sitio <span class="fa arrow"></span></a>
 		<ul class="nav-second-level nav collapse" aria-expanded="false" style="height: 0px;">
 		<li><a href="motd.php">Mensaje del Dia</a></li>
-		<li><a href="tables-advanced.html">Pendiente</a></li>
 		</ul>
 		</li>
 		
@@ -259,7 +260,7 @@ function page_print_topnavbar(){
 		<!-- Top nav left menu -->
 		<ul class="nav navbar-nav hidden-sm hidden-xs top-navbar-items">
 		<li><a href="about.php">Acerca De</a></li>
-		<li><a href="#">Ayuda</a></li>
+		<li><a href="help.php">Ayuda</a></li>
 		<li><a href="contacts.php">Contacto</a></li>
 		</ul>
 
@@ -279,8 +280,6 @@ function page_print_topnavbar(){
 		image_top()
 		.'<ul class="dropdown-menu">
 		<li><a href="profile.php"><i class="ti-user m-r-10"></i> Profile</a></li>
-		<li><a href="javascript:void(0)"><i class="ti-settings m-r-10"></i> Settings</a></li>
-		<li><a href="javascript:test()"><i class="ti-lock m-r-10"></i> Lock screen</a></li>
 		<li class="divider"></li>
 		<li><a href="javascript:logout()"><i class="ti-power-off m-r-10"></i> Logout</a></li>
 		</ul>

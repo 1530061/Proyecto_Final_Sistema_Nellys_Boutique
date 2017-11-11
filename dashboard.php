@@ -44,6 +44,8 @@
         <link href="assets/plugins/clockpicker/css/bootstrap-clockpicker.min.css" rel="stylesheet">
         <link href="assets/plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
 
+        <link href="assets/plugins/fullcalendar/css/fullcalendar.min.css" rel="stylesheet" />
+
 
         <!-- Icons CSS -->
         <link href="assets/css/icons.css" rel="stylesheet">
@@ -195,7 +197,11 @@
                         </div>
                       </div>
                     </div>
-                    
+                    <div class="row">
+                    <div style="height: 150px";"></div>
+                    <h4 style="padding-left:40px"> Actividades del mes</h4>
+                    </div>
+                    <div id='calendar'></div>
                     
                        
                   <!-- end container -->
@@ -241,7 +247,23 @@
         <!-- fun-->
         <script src="lib/fun.js"></script>
 
+        <!-- BEGIN PAGE SCRIPTS -->
+        <script src="assets/plugins/moment/moment.js"></script>
+        <script src='assets/plugins/fullcalendar/js/fullcalendar.min.js'></script>
+        <script src="assets/pages/jquery.fullcalendar.js"></script>
+
+
         <script>
+
+          $(document).ready(function() {
+
+              // page is now ready, initialize the calendar...
+
+              $('#calendar').fullCalendar({
+                  // put your options and callbacks here
+              })
+
+          });
           Morris.Line({
                 element:'grafica_cantidad_top_productos',
                 data: [           
