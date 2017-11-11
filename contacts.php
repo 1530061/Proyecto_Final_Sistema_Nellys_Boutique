@@ -129,7 +129,18 @@
         <!-- js placed at the end of the document so the pages load faster -->
         <script src="assets/js/jquery-2.1.4.min.js"></script>
         <script src="assets/js/bootstrap.min.js"></script>
+        <script src="assets/js/metisMenu.min.js"></script>
         <script src="assets/js/jquery.slimscroll.min.js"></script>
+
+
+
+        <!-- SweetAlert-->
+        <script src="assets/plugins/sweet-alert2/sweetalert2.min.js"></script>
+        <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+        <!-- App Js -->
+        <script src="assets/js/jquery.app.js"></script>
+        
         <!-- Logout-->
         <script src="lib/fun.js"></script>
 

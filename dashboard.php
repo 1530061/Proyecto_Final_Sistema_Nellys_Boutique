@@ -230,7 +230,7 @@ include ("lib/misc.php");             //Funciones compartidas en todos los formu
                   <?php
                   if(get_role_usrbyID($_SESSION['id'])==0)
                   echo('
-                    <h4 style="padding-left: 20px;"> Distribucion de usuarios </h4>
+                    <h4 style="padding-left: 20px;"> Ventas del dia </h4>
                     <div id="grafica_cantidad_top_productos" style="height: 250px;"></div>
                     <div class="row">
                             <div style="padding-left:40px" class="col-lg-6 col-sm-6">

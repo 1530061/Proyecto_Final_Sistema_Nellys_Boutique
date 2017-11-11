@@ -463,7 +463,7 @@ ob_end_clean();
 						total+=parseFloat(arr[i][4]);
 					}
 					total_venta=total;
-					document.getElementById("total_venta").innerHTML="$"+total;
+					document.getElementById("total_venta").innerHTML="$"+Math.round(total*100)/100;
 				}else{
 					document.getElementById("error").innerHTML='<div class="alert alert-danger alert-dismissible fade in" role="alert" style="margin-bottom:0px; margin-left:10px; margin-right:10px;"><button type="button" class="close" data-dismiss="alert" aria-label="Close" ><span aria-hidden="true">×</span></button><strong>Producto no encontrado</strong></div><br>';
 						for(i=0;i<4;i++){
